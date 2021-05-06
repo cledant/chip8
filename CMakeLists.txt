@@ -44,10 +44,13 @@ else ()
     set(CMAKE_C_FLAGS ${CMAKE_CXX_FLAGS})
 endif ()
 
-#
+#Setup SDL2
+option(BUILD_SHARED_LIBS "" OFF)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/SDL2 ${CMAKE_BINARY_DIR}/SDL2/build)
 
 #Project libs
 add_subdirectory(libraries/emulator)
+add_subdirectory(libraries/renderer)
 
 #Main binary
 add_executable(chip8_emu
@@ -55,8 +58,8 @@ add_executable(chip8_emu
 target_include_directories(chip8_emu
         PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/binary/private)
-target_link_libraries(chip8_emu emulator)
-add_dependencies(chip8_emu emulator)
+target_link_libraries(chip8_emu emulator renderer)
+add_dependencies(chip8_emu emulator renderer)
 set_target_properties(chip8_emu PROPERTIES
         C_STANDARD 11
         C_STANDARD_REQUIRED YES

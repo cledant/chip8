@@ -2,7 +2,6 @@
 #define CHIP8_EMULATOR_H
 
 #include <stdint.h>
-#include <stdbool.h>
 
 typedef enum e_emu_rom_type
 {
@@ -13,7 +12,8 @@ typedef enum e_emu_rom_type
     EMU_RT_NB_TYPES,
 } emu_rom_type_t;
 
-typedef enum e_emu_keys {
+typedef enum e_emu_keys
+{
     EMU_KEY_0 = 0,
     EMU_KEY_1,
     EMU_KEY_2,
@@ -33,14 +33,14 @@ typedef enum e_emu_keys {
     EMU_KEY_NB,
 } emu_keys_t;
 
-bool emu_load_rom(char const *rom_path,
-                  emu_rom_type_t rom_type,
-                  char const **err);
+int emu_load_rom(char const *rom_path,
+                 emu_rom_type_t rom_type,
+                 char const **err);
 void *emu_get_framebuffer(int32_t *w, int32_t *h);
-void emu_set_key_state(bool const key_state[EMU_KEY_NB]);
-bool emu_fetch(char const **err);
-bool emu_decode(char const **err);
-bool emu_execute(char const **err);
+void emu_set_key_state(int32_t const key_state[EMU_KEY_NB]);
+int emu_fetch(char const **err);
+int emu_decode(char const **err);
+int emu_execute(char const **err);
 char const *emu_get_debug_register_states();
 
 #endif // CHIP8_EMULATOR_H
