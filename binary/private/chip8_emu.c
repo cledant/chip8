@@ -47,6 +47,7 @@ parse_args(t_env *env, int argc, char const **argv)
             env->rom_type = i;
         }
     }
+    env->rom_path = argv[1];
     if (argc == 4) {
         char *end_ptr;
 
@@ -55,6 +56,24 @@ parse_args(t_env *env, int argc, char const **argv)
             puts("chip8_emu: SCALE is not a number");
             return (1);
         }
+    }
+    return (0);
+}
+
+static int
+open_renderer(long scale, char const **err)
+{
+    if (renderer_init(err)) {
+        return (1);
+    }
+    int32_t fb_w = 0;
+    int32_t fb_h = 0;
+    if (emu_get_framebuffer_size(&fb_w, &fb_h)) {
+        *err = "Failed to get Framebuffer size";
+        return (1);
+    }
+    if (renderer_create_window(fb_w * scale, fb_h * scale, err)) {
+        return (1);
     }
     return (0);
 }
@@ -78,15 +97,16 @@ main(int argc, char const **argv)
     }
 
     char const *err = NULL;
-    if (renderer_init(&err)) {
-        shutdown(err);
-        return (1);
-    }
     if (emu_load_rom(env.rom_path, env.rom_type, &err)) {
         shutdown(err);
         return (1);
     }
+    if (open_renderer(env.scale, &err)) {
+        shutdown(err);
+        return (1);
+    }
     emu_start(&err);
+    renderer_destroy_window();
     shutdown(err);
     return (0);
 }
