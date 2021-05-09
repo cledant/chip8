@@ -2,7 +2,8 @@ cmake_minimum_required(VERSION 3.17)
 project(lib_emulator)
 
 add_library(emulator STATIC
-        private/emulator.c)
+        private/emulator.c
+        private/emu_loop.c)
 target_include_directories(emulator
         PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/public

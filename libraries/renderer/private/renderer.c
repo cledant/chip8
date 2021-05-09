@@ -1,5 +1,7 @@
 #include "renderer.h"
 
+#include <stdio.h>
+
 #include "SDL.h"
 
 int
@@ -22,8 +24,11 @@ renderer_destroy()
 }
 
 int
-renderer_create_window(char const *err)
+renderer_create_window(int32_t w, int32_t h, char const *err)
 {
     (void)err;
+    (void)w;
+    (void)h;
+    puts("TODO renderer_create_window");
     return (0);
 }
