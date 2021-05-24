@@ -3,7 +3,9 @@
 #include <string.h>
 
 #include "renderer.h"
+#include "input.h"
 #include "emulator.h"
+#include "engine.h"
 
 typedef struct s_env
 {
@@ -26,6 +28,8 @@ shutdown(char const *msg)
     if (msg) {
         printf("chip8_emu: %s\n", msg);
     }
+    renderer_destroy_window();
+    input_destroy();
     renderer_destroy();
 }
 
@@ -105,8 +109,11 @@ main(int argc, char const **argv)
         shutdown(err);
         return (1);
     }
-    emu_start(&err);
-    renderer_destroy_window();
+    if (input_init(&err)) {
+        shutdown(err);
+        return (1);
+    }
+    engine_loop(&err);
     shutdown(err);
     return (0);
 }

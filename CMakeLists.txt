@@ -51,6 +51,9 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external/SDL2 ${CMAKE_BINARY_DIR}/S
 #Project libs
 add_subdirectory(libraries/emulator)
 add_subdirectory(libraries/renderer)
+add_subdirectory(libraries/engine)
+add_subdirectory(libraries/input)
+add_subdirectory(libraries/event)
 
 #Main binary
 add_executable(chip8_emu
@@ -58,8 +61,8 @@ add_executable(chip8_emu
 target_include_directories(chip8_emu
         PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/binary/private)
-target_link_libraries(chip8_emu emulator renderer)
-add_dependencies(chip8_emu emulator renderer)
+target_link_libraries(chip8_emu emulator renderer engine input)
+add_dependencies(chip8_emu emulator renderer engine input)
 set_target_properties(chip8_emu PROPERTIES
         C_STANDARD 11
         C_STANDARD_REQUIRED YES

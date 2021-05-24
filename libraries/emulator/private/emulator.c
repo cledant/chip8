@@ -4,15 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "emu_loop.h"
-
-/*
- * Public strings
- */
-char const *emu_rom_types_str[EMU_RT_NB_TYPES] = { "NONE",
-                                                   "CHIP8",
-                                                   "CHIP8_HI_RES",
-                                                   "SUPERCHIP8" };
+#include "emu_def.h"
 
 /*
  * Structs
@@ -49,15 +41,19 @@ static uint8_t const emu_chip_8_fonts[EMU_FONT_NB][EMU_CHIP_8_FONT_HEIGHT] = {
     { 0xF0, 0x80, 0x80, 0x80, 0xF0 }, { 0xE0, 0x90, 0x90, 0x90, 0xE0 },
     { 0xF0, 0x80, 0xF0, 0x80, 0xF0 }, { 0xF0, 0x80, 0xF0, 0x80, 0x80 }
 };
+static int emu_key_values[EMU_KEY_NB] = {
+    '1', '2', '3', '4', 'Q', 'W', 'E', 'R',
+    'A', 'S', 'D', 'F', 'Z', 'X', 'C', 'V',
+};
 
 /*
- * Functions
+ * Internal functions
  */
 static int
-emu_open_rom_file(char const *rom_path,
-                  long *rom_size,
-                  FILE **rom_file,
-                  char const **err)
+open_rom_file(char const *rom_path,
+              long *rom_size,
+              FILE **rom_file,
+              char const **err)
 {
     *rom_file = fopen(rom_path, "r");
     if (!*rom_file) {
@@ -82,6 +78,38 @@ emu_open_rom_file(char const *rom_path,
     return (0);
 }
 
+/*
+ * Public Api
+ */
+char const *emu_rom_types_str[EMU_RT_NB_TYPES] = { "NONE",
+                                                   "CHIP8",
+                                                   "CHIP8_HI_RES",
+                                                   "SUPERCHIP8" };
+
+int
+emu_load_rom(char const *rom_path, emu_rom_type_t rom_type, char const **err)
+{
+    FILE *rom_file = NULL;
+    long rom_size = 0;
+
+    if (open_rom_file(rom_path, &rom_size, &rom_file, err)) {
+        return (1);
+    }
+    memset(&emu_state, 0, sizeof(emu_chip_8_state_t));
+    if (fread(emu_state.ram + EMU_RAM_ENTRY_POINT, rom_size, 1, rom_file) !=
+        1) {
+        fclose(rom_file);
+        *err = "Failed to read Rom";
+        return (1);
+    }
+    memcpy(emu_state.ram,
+           emu_chip_8_fonts,
+           sizeof(uint8_t) * EMU_FONT_NB * EMU_CHIP_8_FONT_HEIGHT);
+    emu_state.registers.program_counter = EMU_RAM_ENTRY_POINT;
+    emu_state.rom_type = rom_type;
+    return (0);
+}
+
 int
 emu_get_framebuffer_size(int32_t *w, int32_t *h)
 {
@@ -103,35 +131,40 @@ emu_get_framebuffer_size(int32_t *w, int32_t *h)
 }
 
 int
-emu_load_rom(char const *rom_path, emu_rom_type_t rom_type, char const **err)
+emu_press_key(int key_value)
 {
-    FILE *rom_file = NULL;
-    long rom_size = 0;
-
-    if (emu_open_rom_file(rom_path, &rom_size, &rom_file, err)) {
-        return (1);
-    }
-    memset(&emu_state, 0, sizeof(emu_chip_8_state_t));
-    if (fread(emu_state.ram + EMU_RAM_ENTRY_POINT, rom_size, 1, rom_file) !=
-        1) {
-        fclose(rom_file);
-        *err = "Failed to read Rom";
-        return (1);
-    }
-    memcpy(emu_state.ram,
-           emu_chip_8_fonts,
-           sizeof(uint8_t) * EMU_FONT_NB * EMU_CHIP_8_FONT_HEIGHT);
-    emu_state.registers.program_counter = EMU_RAM_ENTRY_POINT;
-    emu_state.rom_type = rom_type;
+    (void)emu_key_values;
+    putchar(key_value);
+    putchar('\n');
     return (0);
 }
 
 int
-emu_start(char const **err)
+emu_release_key(int key_value)
 {
-    if (emu_state.rom_type == EMU_RT_NONE) {
-        *err = "No Rom loaded";
-        return (1);
-    }
-    return (emu_loop(err));
+    (void)emu_key_values;
+    putchar(key_value);
+    putchar('\n');
+    return (0);
+}
+
+int
+emu_fetch(char const **err)
+{
+    *err = "TODO emu_fetch";
+    return (1);
+}
+
+int
+emu_decode(char const **err)
+{
+    *err = "TODO emu_decode";
+    return (1);
+}
+
+int
+emu_execute(char const **err)
+{
+    *err = "TODO emu_execute";
+    return (1);
 }

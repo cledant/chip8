@@ -18,6 +18,10 @@ int emu_load_rom(char const *rom_path,
                  emu_rom_type_t rom_type,
                  char const **err);
 int emu_get_framebuffer_size(int32_t *w, int32_t *h);
-int emu_start(char const **err);
+int emu_press_key(int key_value);
+int emu_release_key(int key_value);
+int emu_fetch(char const **err);
+int emu_decode(char const **err);
+int emu_execute(char const **err);
 
 #endif // CHIP8_EMULATOR_H
