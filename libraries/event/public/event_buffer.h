@@ -16,8 +16,8 @@ typedef enum e_event_type
 typedef struct s_event
 {
     event_type_t type;
-    int data1;
-    int data2;
+    int32_t data1;
+    int32_t data2;
 } event_t;
 
 int event_push(event_t const *event);

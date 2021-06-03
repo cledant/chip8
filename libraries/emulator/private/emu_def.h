@@ -28,6 +28,12 @@
 #define EMU_FRAMEBUFFER_SIZE (EMU_SUPER_CHIP_8_W * EMU_SUPER_CHIP_8_H / 8)
 
 /*
+ * Other
+ */
+#define EMU_KEY_PRESSED 1
+#define EMU_KEY_RELEASED 0
+
+/*
  * Enums
  */
 typedef enum e_emu_chip_8_registers

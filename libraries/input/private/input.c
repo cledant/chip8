@@ -14,7 +14,7 @@ static SDL_Scancode const input_key_scancode[NB_KEYS] = {
     SDL_SCANCODE_A, SDL_SCANCODE_S, SDL_SCANCODE_D, SDL_SCANCODE_F,
     SDL_SCANCODE_Z, SDL_SCANCODE_X, SDL_SCANCODE_C, SDL_SCANCODE_V,
 };
-static int const input_key_value[NB_KEYS] = {
+static int32_t const input_key_value[NB_KEYS] = {
     '1', '2', '3', '4', 'Q', 'W', 'E', 'R',
     'A', 'S', 'D', 'F', 'Z', 'X', 'C', 'V',
 };

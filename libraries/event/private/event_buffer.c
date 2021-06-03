@@ -3,8 +3,8 @@
 #define MAX_EVENT_NB 128
 
 static event_t event_buffer[MAX_EVENT_NB];
-static int event_head = 0;
-static int event_tail = 0;
+static int32_t event_head = 0;
+static int32_t event_tail = 0;
 
 int
 event_push(event_t const *event)

@@ -1,5 +1,7 @@
 #include "engine.h"
 
+#include <stddef.h>
+
 #include "emulator.h"
 #include "input.h"
 #include "event_buffer.h"
@@ -37,6 +39,7 @@ engine_loop(char const **err)
             return (1);
         }
         process_event();
+        emu_execute(NULL);
     }
     return (0);
 }

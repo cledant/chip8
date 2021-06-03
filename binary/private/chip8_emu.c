@@ -65,7 +65,7 @@ parse_args(t_env *env, int argc, char const **argv)
 }
 
 static int
-open_renderer(long scale, char const **err)
+open_renderer(int32_t scale, char const **err)
 {
     if (renderer_init(err)) {
         return (1);
@@ -73,10 +73,13 @@ open_renderer(long scale, char const **err)
     int32_t fb_w = 0;
     int32_t fb_h = 0;
     if (emu_get_framebuffer_size(&fb_w, &fb_h)) {
-        *err = "Failed to get Framebuffer size";
+        *err = "Unknown type of chip";
         return (1);
     }
     if (renderer_create_window(fb_w * scale, fb_h * scale, err)) {
+        return (1);
+    }
+    if (renderer_create_framebuffer(fb_w, fb_h, 0x00AA0000, err)) {
         return (1);
     }
     return (0);
@@ -109,6 +112,7 @@ main(int argc, char const **argv)
         shutdown(err);
         return (1);
     }
+    emu_set_renderer_draw(&renderer_draw);
     if (input_init(&err)) {
         shutdown(err);
         return (1);

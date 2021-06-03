@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "emu_def.h"
 
@@ -31,6 +32,7 @@ typedef struct s_emu_chip_8_state
  * Emulator variables
  */
 static emu_chip_8_state_t emu_state;
+static draw_fct renderer_draw;
 static uint8_t const emu_chip_8_fonts[EMU_FONT_NB][EMU_CHIP_8_FONT_HEIGHT] = {
     { 0xF0, 0x90, 0x90, 0x90, 0xF0 }, { 0x20, 0x60, 0x20, 0x20, 0x70 },
     { 0xF0, 0x10, 0xF0, 0x80, 0xF0 }, { 0xF0, 0x10, 0xF0, 0x10, 0xF0 },
@@ -41,7 +43,7 @@ static uint8_t const emu_chip_8_fonts[EMU_FONT_NB][EMU_CHIP_8_FONT_HEIGHT] = {
     { 0xF0, 0x80, 0x80, 0x80, 0xF0 }, { 0xE0, 0x90, 0x90, 0x90, 0xE0 },
     { 0xF0, 0x80, 0xF0, 0x80, 0xF0 }, { 0xF0, 0x80, 0xF0, 0x80, 0x80 }
 };
-static int emu_key_values[EMU_KEY_NB] = {
+static int const emu_key_values[EMU_KEY_NB] = {
     '1', '2', '3', '4', 'Q', 'W', 'E', 'R',
     'A', 'S', 'D', 'F', 'Z', 'X', 'C', 'V',
 };
@@ -110,6 +112,12 @@ emu_load_rom(char const *rom_path, emu_rom_type_t rom_type, char const **err)
     return (0);
 }
 
+void
+emu_set_renderer_draw(draw_fct fct)
+{
+    renderer_draw = fct;
+}
+
 int
 emu_get_framebuffer_size(int32_t *w, int32_t *h)
 {
@@ -133,19 +141,25 @@ emu_get_framebuffer_size(int32_t *w, int32_t *h)
 int
 emu_press_key(int key_value)
 {
-    (void)emu_key_values;
-    putchar(key_value);
-    putchar('\n');
-    return (0);
+    for (int i = 0; i < EMU_KEY_NB; ++i) {
+        if (key_value == emu_key_values[i]) {
+            emu_state.keys_state[i] = EMU_KEY_PRESSED;
+            return (0);
+        }
+    }
+    return (1);
 }
 
 int
 emu_release_key(int key_value)
 {
-    (void)emu_key_values;
-    putchar(key_value);
-    putchar('\n');
-    return (0);
+    for (int i = 0; i < EMU_KEY_NB; ++i) {
+        if (key_value == emu_key_values[i]) {
+            emu_state.keys_state[i] = EMU_KEY_RELEASED;
+            return (0);
+        }
+    }
+    return (1);
 }
 
 int
@@ -165,6 +179,16 @@ emu_decode(char const **err)
 int
 emu_execute(char const **err)
 {
-    *err = "TODO emu_execute";
-    return (1);
+    (void)err;
+    static int32_t i = 0;
+    static uint8_t mask = 0;
+
+    emu_state.framebuffer[i] ^= (1 << mask);
+    mask = (mask + 1) % 8;
+    if (!mask) {
+        ++i;
+    }
+    (*renderer_draw)(emu_state.framebuffer);
+    sleep(1);
+    return (0);
 }
