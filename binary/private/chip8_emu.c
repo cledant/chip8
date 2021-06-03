@@ -79,7 +79,7 @@ open_renderer(int32_t scale, char const **err)
     if (renderer_create_window(fb_w * scale, fb_h * scale, err)) {
         return (1);
     }
-    if (renderer_create_framebuffer(fb_w, fb_h, 0x00AA0000, err)) {
+    if (renderer_create_framebuffer(fb_w, fb_h, 0x00AA00, err)) {
         return (1);
     }
     return (0);
@@ -112,7 +112,7 @@ main(int argc, char const **argv)
         shutdown(err);
         return (1);
     }
-    emu_set_renderer_draw(&renderer_draw);
+    emu_set_draw_fct(&renderer_draw);
     if (input_init(&err)) {
         shutdown(err);
         return (1);

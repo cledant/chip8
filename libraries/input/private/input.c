@@ -100,7 +100,7 @@ input_init(char const **err)
         if (err) {
             *err = "Failed to Init SDL2 Video";
         }
-        return (-1);
+        return (1);
     }
     atexit(SDL_Quit);
     return (0);
@@ -115,7 +115,6 @@ input_destroy()
 int
 input_get(char const **err)
 {
-    (void)err;
     SDL_Event event;
 
     int ret = 0;

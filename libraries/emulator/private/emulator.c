@@ -32,7 +32,7 @@ typedef struct s_emu_chip_8_state
  * Emulator variables
  */
 static emu_chip_8_state_t emu_state;
-static draw_fct renderer_draw;
+static draw_fct_t emu_draw_fct;
 static uint8_t const emu_chip_8_fonts[EMU_FONT_NB][EMU_CHIP_8_FONT_HEIGHT] = {
     { 0xF0, 0x90, 0x90, 0x90, 0xF0 }, { 0x20, 0x60, 0x20, 0x20, 0x70 },
     { 0xF0, 0x10, 0xF0, 0x80, 0xF0 }, { 0xF0, 0x10, 0xF0, 0x10, 0xF0 },
@@ -113,9 +113,9 @@ emu_load_rom(char const *rom_path, emu_rom_type_t rom_type, char const **err)
 }
 
 void
-emu_set_renderer_draw(draw_fct fct)
+emu_set_draw_fct(draw_fct_t ptr)
 {
-    renderer_draw = fct;
+    emu_draw_fct = ptr;
 }
 
 int
@@ -129,7 +129,7 @@ emu_get_framebuffer_size(int32_t *w, int32_t *h)
         *h = EMU_CHIP8_HI_RES_H;
     } else if (emu_state.rom_type == EMU_RT_SUPER_CHIP_8) {
         *w = EMU_SUPER_CHIP_8_W;
-        *h = EMU_SUPER_CHIP_8_W;
+        *h = EMU_SUPER_CHIP_8_H;
     } else {
         *w = 0;
         *h = 0;
@@ -188,7 +188,7 @@ emu_execute(char const **err)
     if (!mask) {
         ++i;
     }
-    (*renderer_draw)(emu_state.framebuffer);
+    (*emu_draw_fct)(emu_state.framebuffer);
     sleep(1);
     return (0);
 }

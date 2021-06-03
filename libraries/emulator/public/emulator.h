@@ -11,14 +11,14 @@ typedef enum e_emu_rom_type
     EMU_RT_SUPER_CHIP_8,
     EMU_RT_NB_TYPES,
 } emu_rom_type_t;
-typedef int (*draw_fct)(void const *);
+typedef int (*draw_fct_t)(void const *);
 
 extern char const *emu_rom_types_str[EMU_RT_NB_TYPES];
 
 int emu_load_rom(char const *rom_path,
                  emu_rom_type_t rom_type,
                  char const **err);
-void emu_set_renderer_draw(draw_fct fct);
+void emu_set_draw_fct(draw_fct_t ptr);
 int emu_get_framebuffer_size(int32_t *w, int32_t *h);
 int emu_press_key(int32_t key_value);
 int emu_release_key(int32_t key_value);
