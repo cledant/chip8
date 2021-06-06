@@ -5,7 +5,9 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "emu_inst.h"
 #include "emu_def.h"
+#include "emu_chip8.h"
 
 /*
  * Structs
@@ -33,6 +35,14 @@ typedef struct s_emu_chip_8_state
  */
 static emu_chip_8_state_t emu_state;
 static draw_fct_t emu_draw_fct;
+static uint16_t *emu_next_inst_data;
+static uint32_t emu_max_addr;
+static emu_parse_fct *emu_parse_fcts;
+static emu_exec_fct *emu_exec_fcts;
+
+/*
+ * Emulator constants
+ */
 static uint8_t const emu_chip_8_fonts[EMU_FONT_NB][EMU_CHIP_8_FONT_HEIGHT] = {
     { 0xF0, 0x90, 0x90, 0x90, 0xF0 }, { 0x20, 0x60, 0x20, 0x20, 0x70 },
     { 0xF0, 0x10, 0xF0, 0x80, 0xF0 }, { 0xF0, 0x10, 0xF0, 0x10, 0xF0 },
@@ -83,7 +93,7 @@ open_rom_file(char const *rom_path,
 /*
  * Public Api
  */
-char const *emu_rom_types_str[EMU_RT_NB_TYPES] = { "NONE",
+char const *g_emu_rom_types_str[EMU_RT_NB_TYPES] = { "NONE",
                                                    "CHIP8",
                                                    "CHIP8_HI_RES",
                                                    "SUPERCHIP8" };
@@ -104,11 +114,28 @@ emu_load_rom(char const *rom_path, emu_rom_type_t rom_type, char const **err)
         *err = "Failed to read Rom";
         return (1);
     }
+    fclose(rom_file);
     memcpy(emu_state.ram,
            emu_chip_8_fonts,
            sizeof(uint8_t) * EMU_FONT_NB * EMU_CHIP_8_FONT_HEIGHT);
     emu_state.registers.program_counter = EMU_RAM_ENTRY_POINT;
     emu_state.rom_type = rom_type;
+    if (rom_type == EMU_RT_CHIP_8) {
+        emu_max_addr = EMU_CHIP8_MAX_PROG_RAM_ADDR;
+        emu_parse_fcts = g_emu_chip8_parse_fcts;
+        emu_exec_fcts = g_emu_chip8_exec_fcts;
+    } else if (rom_type == EMU_RT_CHIP_8_HI_RES) {
+        emu_max_addr = EMU_CHIP8_MAX_PROG_RAM_ADDR;
+        *err = "Not Implemented yet";
+        return (1);
+    } else if (rom_type == EMU_RT_SUPER_CHIP_8) {
+        emu_max_addr = EMU_SUPER_CHIP8_MAX_PROG_RAM_ADDR;
+        *err = "Not Implemented yet";
+        return (1);
+    } else {
+        *err = "Loading invalid rom type";
+        return (1);
+    }
     return (0);
 }
 
@@ -165,13 +192,23 @@ emu_release_key(int key_value)
 int
 emu_fetch(char const **err)
 {
-    *err = "TODO emu_fetch";
-    return (1);
+    if (emu_state.registers.program_counter >= emu_max_addr) {
+        *err = "Next instruction address is outside the possible range";
+        emu_next_inst_data = NULL;
+        return (1);
+    }
+    emu_next_inst_data =
+      (uint16_t *)&emu_state.ram[emu_state.registers.program_counter];
+    emu_state.registers.program_counter += 2;
+    return (0);
 }
 
 int
 emu_decode(char const **err)
 {
+    emu_inst_t inst = { .raw_data = *emu_next_inst_data };
+
+    (void)inst;
     *err = "TODO emu_decode";
     return (1);
 }

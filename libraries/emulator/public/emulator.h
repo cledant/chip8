@@ -13,7 +13,7 @@ typedef enum e_emu_rom_type
 } emu_rom_type_t;
 typedef int (*draw_fct_t)(void const *);
 
-extern char const *emu_rom_types_str[EMU_RT_NB_TYPES];
+extern char const *g_emu_rom_types_str[EMU_RT_NB_TYPES];
 
 int emu_load_rom(char const *rom_path,
                  emu_rom_type_t rom_type,

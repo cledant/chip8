@@ -47,7 +47,7 @@ parse_args(t_env *env, int argc, char const **argv)
         return (1);
     }
     for (int i = 0; i < EMU_RT_NB_TYPES; i++) {
-        if (!strcmp(argv[2], emu_rom_types_str[i])) {
+        if (!strcmp(argv[2], g_emu_rom_types_str[i])) {
             env->rom_type = i;
         }
     }
