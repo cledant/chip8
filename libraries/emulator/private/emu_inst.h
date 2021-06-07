@@ -26,7 +26,7 @@ typedef struct s_emu_inst
 /*
  * Types
  */
-typedef int (*emu_exec_fct)(emu_inst_t);
-typedef int (*emu_parse_fct)(emu_inst_t);
+typedef int (*emu_exec_fct_t)(emu_inst_t, char const **);
+typedef emu_exec_fct_t (*emu_parse_fct_t)(emu_inst_t);
 
 #endif // CHIP8_EMU_EMU_INST_H

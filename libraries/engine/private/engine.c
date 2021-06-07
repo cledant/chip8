@@ -1,6 +1,6 @@
 #include "engine.h"
 
-#include <stddef.h>
+#include <stdio.h>
 
 #include "emulator.h"
 #include "input.h"
@@ -32,14 +32,28 @@ process_event()
 }
 
 int
-engine_loop(char const **err)
+engine_loop()
 {
+    char const *err = NULL;
+
     while (!should_close) {
-        if (input_get(err)) {
+        if (input_get(&err)) {
+            printf("[FATAL][INPUT]: %s\n", err);
             return (1);
         }
         process_event();
-        emu_execute(NULL);
+        if (emu_fetch(&err)) {
+            printf("[FATAL][FETCH]: %s\n", err);
+            return (1);
+        }
+        if (emu_decode(&err)) {
+            printf("[WARN][DECODE]: %s\n", err);
+            err = NULL;
+        }
+        if (emu_execute(&err)) {
+            printf("[WARN][EXEC]: %s\n", err);
+            err = NULL;
+        }
     }
     return (0);
 }
