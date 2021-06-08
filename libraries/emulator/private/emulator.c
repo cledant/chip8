@@ -102,7 +102,6 @@ emu_load_rom(char const *rom_path, emu_rom_type_t rom_type, char const **err)
 
     memset(&emu_state, 0, sizeof(emu_state_t));
     emu_state.registers.program_counter = EMU_RAM_ENTRY_POINT;
-
     emu_rom_type = rom_type;
     if (rom_type == EMU_RT_CHIP_8) {
         emu_max_addr = EMU_CHIP8_MAX_PROG_RAM_ADDR;
@@ -183,7 +182,7 @@ emu_fetch(char const **err)
 {
     static char err_buffer[256];
 
-    if (emu_state.registers.program_counter) {
+    if (emu_state.registers.program_counter % 2) {
         printf("[WARN][FETCH]: PC (%x) not even aligned\n",
                emu_state.registers.program_counter);
     }

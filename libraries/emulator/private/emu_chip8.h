@@ -33,12 +33,13 @@ emu_exec_fct_t chip8_is_jp_v0_addr(emu_inst_t inst);
 emu_exec_fct_t chip8_is_rnd(emu_inst_t inst);
 emu_exec_fct_t chip8_is_draw(emu_inst_t inst);
 emu_exec_fct_t chip8_is_skp(emu_inst_t inst);
+emu_exec_fct_t chip8_is_sknp(emu_inst_t inst);
 emu_exec_fct_t chip8_is_ld_register_delay(emu_inst_t inst);
 emu_exec_fct_t chip8_is_ld_register_key(emu_inst_t inst);
 emu_exec_fct_t chip8_is_ld_delay_register(emu_inst_t inst);
 emu_exec_fct_t chip8_is_ld_sound_register(emu_inst_t inst);
 emu_exec_fct_t chip8_is_add_addr_register_register(emu_inst_t inst);
-emu_exec_fct_t chip8_is_ld_fb_register(emu_inst_t inst);
+emu_exec_fct_t chip8_is_ld_font_addr_addr_register(emu_inst_t inst);
 emu_exec_fct_t chip8_is_ld_bcd_addr(emu_inst_t inst);
 emu_exec_fct_t chip8_is_ld_store_register(emu_inst_t inst);
 emu_exec_fct_t chip8_is_ld_read_register(emu_inst_t inst);
@@ -85,6 +86,7 @@ int chip8_exec_jp_v0_addr(emu_inst_t inst, void *state, char const **err);
 int chip8_exec_rnd(emu_inst_t inst, void *state, char const **err);
 int chip8_exec_draw(emu_inst_t inst, void *state, char const **err);
 int chip8_exec_skp(emu_inst_t inst, void *state, char const **err);
+int chip8_exec_sknp(emu_inst_t inst, void *state, char const **err);
 int chip8_exec_ld_register_delay(emu_inst_t inst,
                                  void *state,
                                  char const **err);
@@ -92,13 +94,15 @@ int chip8_exec_ld_register_key(emu_inst_t inst, void *state, char const **err);
 int chip8_exec_ld_delay_register(emu_inst_t inst,
                                  void *state,
                                  char const **err);
-int chip8_exec_st_sound_register(emu_inst_t inst,
+int chip8_exec_ld_sound_register(emu_inst_t inst,
                                  void *state,
                                  char const **err);
 int chip8_exec_add_addr_register_register(emu_inst_t inst,
                                           void *state,
                                           char const **err);
-int chip8_exec_ld_fb_register(emu_inst_t inst, void *state, char const **err);
+int chip8_exec_ld_font_addr_addr_register(emu_inst_t inst,
+                                          void *state,
+                                          char const **err);
 int chip8_exec_ld_bcd_addr(emu_inst_t inst, void *state, char const **err);
 int chip8_exec_ld_store_register(emu_inst_t inst,
                                  void *state,

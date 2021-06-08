@@ -19,6 +19,7 @@ show_help()
 {
     puts("./chip8_emu [-h | --help] ROM_FILEPATH ROM_TYPE [SCALE]");
     puts("\tROM TYPE can be CHIP8, CHIP8_HI_RES, SUPERCHIP8");
+    puts("\tSUPERCHIP8 supported version is 1.1");
     puts("\tSCALE default is 4");
 }
 

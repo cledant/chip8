@@ -18,12 +18,13 @@
 typedef struct s_emu_registers_state
 {
     uint8_t general_registers[EMU_MAX_GENERAL_REGISTERS];
-    uint8_t delay_register;
-    uint8_t sound_register;
     uint16_t address_register;
     uint16_t program_counter;
     uint16_t stack[EMU_MAX_STACK_SIZE];
+    uint8_t delay_register;
+    uint8_t sound_register;
     uint8_t current_stack;
+    uint8_t skip_fetch;
 } emu_registers_state_t;
 
 typedef struct s_emu_state
