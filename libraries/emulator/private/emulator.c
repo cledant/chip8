@@ -4,35 +4,17 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "emu_state.h"
 #include "emu_inst.h"
 #include "emu_def.h"
 #include "emu_chip8.h"
 
 /*
- * Structs
- */
-typedef struct s_chip_8_registers_state
-{
-    uint8_t general_registers[EMU_NB_REGISTERS_MAX];
-    uint16_t address_register;
-    uint16_t program_counter;
-    uint16_t stack[EMU_MAX_STACK_SIZE];
-    uint8_t current_stack;
-} chip_8_registers_state_t;
-
-typedef struct s_emu_chip_8_state
-{
-    emu_rom_type_t rom_type;
-    uint8_t ram[EMU_CHIP_8_ROM_SIZE];
-    int32_t keys_state[EMU_KEY_NB];
-    chip_8_registers_state_t registers;
-    uint8_t framebuffer[EMU_FRAMEBUFFER_SIZE];
-} emu_chip_8_state_t;
-
-/*
  * Emulator variables
  */
-static emu_chip_8_state_t emu_state;
+static emu_rom_type_t emu_rom_type;
+static uint8_t emu_ram[EMU_CHIP_8_RAM_SIZE];
+static emu_state_t emu_state;
 static draw_fct_t emu_draw_fct;
 static uint32_t emu_max_addr;
 static emu_parse_fct_t *emu_parse_fcts;
@@ -43,7 +25,7 @@ static emu_exec_fct_t emu_exec_fct;
 /*
  * Emulator constants
  */
-static uint8_t const emu_chip_8_fonts[EMU_FONT_NB][EMU_CHIP_8_FONT_HEIGHT] = {
+static uint8_t const emu_chip_8_fonts[EMU_NB_FONTS][EMU_CHIP_8_FONT_HEIGHT] = {
     { 0xF0, 0x90, 0x90, 0x90, 0xF0 }, { 0x20, 0x60, 0x20, 0x20, 0x70 },
     { 0xF0, 0x10, 0xF0, 0x80, 0xF0 }, { 0xF0, 0x10, 0xF0, 0x10, 0xF0 },
     { 0x90, 0x90, 0xF0, 0x10, 0x10 }, { 0xF0, 0x80, 0xF0, 0x10, 0xF0 },
@@ -53,7 +35,7 @@ static uint8_t const emu_chip_8_fonts[EMU_FONT_NB][EMU_CHIP_8_FONT_HEIGHT] = {
     { 0xF0, 0x80, 0x80, 0x80, 0xF0 }, { 0xE0, 0x90, 0x90, 0x90, 0xE0 },
     { 0xF0, 0x80, 0xF0, 0x80, 0xF0 }, { 0xF0, 0x80, 0xF0, 0x80, 0x80 }
 };
-static int const emu_key_values[EMU_KEY_NB] = {
+static int const emu_key_values[EMU_NB_KEYS] = {
     '1', '2', '3', '4', 'Q', 'W', 'E', 'R',
     'A', 'S', 'D', 'F', 'Z', 'X', 'C', 'V',
 };
@@ -107,21 +89,21 @@ emu_load_rom(char const *rom_path, emu_rom_type_t rom_type, char const **err)
     if (open_rom_file(rom_path, &rom_size, &rom_file, err)) {
         return (1);
     }
-    memset(&emu_state, 0, sizeof(emu_chip_8_state_t));
-    if (fread(emu_state.ram + EMU_RAM_ENTRY_POINT, rom_size, 1, rom_file) !=
-        1) {
+    memset(emu_ram, 0, sizeof(uint8_t) * EMU_CHIP_8_RAM_SIZE);
+    memcpy(emu_ram,
+           emu_chip_8_fonts,
+           sizeof(uint8_t) * EMU_NB_FONTS * EMU_CHIP_8_FONT_HEIGHT);
+    if (fread(emu_ram + EMU_RAM_ENTRY_POINT, rom_size, 1, rom_file) != 1) {
         fclose(rom_file);
         *err = "Failed to read Rom";
         return (1);
     }
     fclose(rom_file);
 
-    memcpy(emu_state.ram,
-           emu_chip_8_fonts,
-           sizeof(uint8_t) * EMU_FONT_NB * EMU_CHIP_8_FONT_HEIGHT);
+    memset(&emu_state, 0, sizeof(emu_state_t));
     emu_state.registers.program_counter = EMU_RAM_ENTRY_POINT;
-    emu_state.rom_type = rom_type;
 
+    emu_rom_type = rom_type;
     if (rom_type == EMU_RT_CHIP_8) {
         emu_max_addr = EMU_CHIP8_MAX_PROG_RAM_ADDR;
         emu_nb_inst = EMU_CHIP8_NB_INST;
@@ -140,6 +122,7 @@ emu_load_rom(char const *rom_path, emu_rom_type_t rom_type, char const **err)
         return (1);
     } else {
         *err = "Loading invalid rom type";
+        emu_rom_type = EMU_RT_NONE;
         return (1);
     }
     return (0);
@@ -154,13 +137,13 @@ emu_set_draw_fct(draw_fct_t ptr)
 int
 emu_get_framebuffer_size(int32_t *w, int32_t *h)
 {
-    if (emu_state.rom_type == EMU_RT_CHIP_8) {
+    if (emu_rom_type == EMU_RT_CHIP_8) {
         *w = EMU_CHIP8_W;
         *h = EMU_CHIP8_H;
-    } else if (emu_state.rom_type == EMU_RT_CHIP_8) {
+    } else if (emu_rom_type == EMU_RT_CHIP_8_HI_RES) {
         *w = EMU_CHIP8_HI_RES_W;
         *h = EMU_CHIP8_HI_RES_H;
-    } else if (emu_state.rom_type == EMU_RT_SUPER_CHIP_8) {
+    } else if (emu_rom_type == EMU_RT_SUPER_CHIP_8) {
         *w = EMU_SUPER_CHIP_8_W;
         *h = EMU_SUPER_CHIP_8_H;
     } else {
@@ -174,7 +157,7 @@ emu_get_framebuffer_size(int32_t *w, int32_t *h)
 int
 emu_press_key(int key_value)
 {
-    for (int i = 0; i < EMU_KEY_NB; ++i) {
+    for (int i = 0; i < EMU_NB_KEYS; ++i) {
         if (key_value == emu_key_values[i]) {
             emu_state.keys_state[i] = EMU_KEY_PRESSED;
             return (0);
@@ -186,7 +169,7 @@ emu_press_key(int key_value)
 int
 emu_release_key(int key_value)
 {
-    for (int i = 0; i < EMU_KEY_NB; ++i) {
+    for (int i = 0; i < EMU_NB_KEYS; ++i) {
         if (key_value == emu_key_values[i]) {
             emu_state.keys_state[i] = EMU_KEY_RELEASED;
             return (0);
@@ -214,8 +197,7 @@ emu_fetch(char const **err)
         emu_inst_data = NULL;
         return (1);
     }
-    emu_inst_data =
-      (uint16_t *)&emu_state.ram[emu_state.registers.program_counter];
+    emu_inst_data = (uint16_t *)&emu_ram[emu_state.registers.program_counter];
     emu_state.registers.program_counter += 2;
     return (0);
 }
@@ -245,7 +227,7 @@ emu_execute(char const **err)
     if (emu_exec_fct) {
         emu_inst_t inst = { .raw_data = *emu_inst_data };
 
-        int ret = (emu_exec_fct)(inst, err);
+        int ret = (emu_exec_fct)(inst, &emu_state, err);
         emu_exec_fct = NULL;
         return (ret);
     }

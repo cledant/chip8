@@ -4,6 +4,13 @@
 #include <stdint.h>
 
 /*
+ * Defines
+ */
+#define EMU_CHIP8_NB_INST 33
+#define EMU_CHIP8_HI_RES_NB_INST 35 // TODO : Check
+#define EMU_SUPER_CHIP8_NB_INST 43  // TODO : Check
+
+/*
  * Structs
  */
 typedef struct s_emu_inst_nibbles
@@ -26,7 +33,7 @@ typedef struct s_emu_inst
 /*
  * Types
  */
-typedef int (*emu_exec_fct_t)(emu_inst_t, char const **);
+typedef int (*emu_exec_fct_t)(emu_inst_t, void *, char const **);
 typedef emu_exec_fct_t (*emu_parse_fct_t)(emu_inst_t);
 
 #endif // CHIP8_EMU_EMU_INST_H
