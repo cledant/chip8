@@ -28,14 +28,35 @@ typedef struct s_emu_inst_addr
     uint8_t op_code : 4;
     uint16_t addr : 12;
 } emu_inst_addr_t;
-#pragma pack(pop)
 static_assert(sizeof(emu_inst_addr_t) == 2, "emu_inst_addr_t size isn't 2");
+
+typedef struct s_emu_inst_reg_uint8
+{
+    uint8_t op_code : 4;
+    uint8_t gen_reg : 4;
+    uint8_t value;
+} emu_inst_reg_uint8_t;
+static_assert(sizeof(emu_inst_reg_uint8_t) == 2,
+              "emu_inst_uint8_val_t size isn't 2");
+
+typedef struct s_emu_inst_reg_reg
+{
+    uint8_t op_code_1 : 4;
+    uint8_t gen_reg_x : 4;
+    uint8_t gen_reg_y : 4;
+    uint8_t op_code_2 : 4;
+} emu_inst_reg_reg_t;
+static_assert(sizeof(emu_inst_reg_reg_t) == 2,
+              "emu_inst_reg_reg_t size isn't 2");
+#pragma pack(pop)
 
 typedef union u_emu_inst
 {
     uint16_t raw_data;
     emu_inst_nibbles_t nibbles;
-    emu_inst_addr_t addr;
+    emu_inst_addr_t inst_addr;
+    emu_inst_reg_uint8_t inst_reg_uint8;
+    emu_inst_reg_reg_t inst_reg_reg;
 } emu_inst_t;
 static_assert(sizeof(emu_inst_t) == 2, "emu_inst_t size isn't 2");
 

@@ -401,12 +401,18 @@ int
 chip8_exec_cls(emu_inst_t inst, void *state, char const **err)
 {
     (void)inst;
-    (void)err;
-    emu_state_t *emu_state = state;
-    chip8_draw_fct draw_fct = emu_state->draw_fct;
+    emu_state_t *es = state;
+    chip8_draw_fct draw_fct = es->draw_fct;
 
-    memset(emu_state->framebuffer, 0, EMU_FRAMEBUFFER_SIZE);
-    (draw_fct)(emu_state->framebuffer);
+    memset(es->framebuffer, 0, EMU_FRAMEBUFFER_SIZE);
+    if ((draw_fct)(es->framebuffer)) {
+        snprintf(chip8_err_buffer,
+                 CHIP8_ERROR_BUFFER_SIZE,
+                 "Renderer failed to draw CLS at 0x%x",
+                 es->registers.program_counter);
+        *err = chip8_err_buffer;
+        return (1);
+    }
     return (0);
 }
 
@@ -414,64 +420,82 @@ int
 chip8_exec_ret(emu_inst_t inst, void *state, char const **err)
 {
     (void)inst;
-    emu_state_t *emu_state = state;
+    emu_state_t *es = state;
+    emu_registers_state_t *rs = &es->registers;
 
-    if (!emu_state->registers.current_stack) {
+    if (!rs->current_stack) {
         snprintf(chip8_err_buffer,
                  CHIP8_ERROR_BUFFER_SIZE,
                  "RET at %x on empty stack pointer",
-                 emu_state->registers.program_counter);
+                 rs->program_counter);
         *err = chip8_err_buffer;
         return (1);
     }
-    emu_state->registers.program_counter =
-      emu_state->registers.stack_pointer[emu_state->registers.current_stack];
-    emu_state->registers.current_stack -= 1;
+    rs->program_counter = rs->stack_pointer[rs->current_stack--];
     return (0);
 }
 
 int
 chip8_exec_jp_addr(emu_inst_t inst, void *state, char const **err)
 {
-    (void)inst;
-    (void)state;
     (void)err;
+    emu_state_t *es = state;
+
+    es->registers.program_counter = inst.inst_addr.addr;
     return (0);
 }
 
 int
 chip8_exec_call(emu_inst_t inst, void *state, char const **err)
 {
-    (void)inst;
-    (void)state;
     (void)err;
+    (void)inst;
+    emu_state_t *es = state;
+    emu_registers_state_t *rs = &es->registers;
+
+    rs->stack_pointer[rs->current_stack++] = rs->program_counter;
     return (0);
 }
 
 int
 chip8_exec_se_register_byte(emu_inst_t inst, void *state, char const **err)
 {
-    (void)inst;
-    (void)state;
     (void)err;
+    emu_state_t *es = state;
+    emu_registers_state_t *rs = &es->registers;
+
+    if (rs->general_registers[inst.inst_reg_uint8.gen_reg] ==
+        inst.inst_reg_uint8.value) {
+        rs->program_counter += 2;
+    }
     return (0);
 }
 
 int
 chip8_exec_sne_register_byte(emu_inst_t inst, void *state, char const **err)
 {
-    (void)inst;
-    (void)state;
     (void)err;
+    emu_state_t *es = state;
+    emu_registers_state_t *rs = &es->registers;
+
+    if (rs->general_registers[inst.inst_reg_uint8.gen_reg] !=
+        inst.inst_reg_uint8.value) {
+        rs->program_counter += 2;
+    }
     return (0);
 }
 
 int
 chip8_exec_se_register_register(emu_inst_t inst, void *state, char const **err)
 {
-    (void)inst;
-    (void)state;
     (void)err;
+    emu_state_t *es = state;
+    emu_registers_state_t *rs = &es->registers;
+
+    if (rs->general_registers[inst.inst_reg_reg.gen_reg_x] ==
+        rs->general_registers[inst.inst_reg_reg.gen_reg_y]) {
+        rs->program_counter += 2;
+    }
     return (0);
 }
 
@@ -577,9 +601,14 @@ chip8_exec_shl(emu_inst_t inst, void *state, char const **err)
 int
 chip8_exec_sne_register_register(emu_inst_t inst, void *state, char const **err)
 {
-    (void)inst;
-    (void)state;
     (void)err;
+    emu_state_t *es = state;
+    emu_registers_state_t *rs = &es->registers;
+
+    if (rs->general_registers[inst.inst_reg_reg.gen_reg_x] !=
+        rs->general_registers[inst.inst_reg_reg.gen_reg_y]) {
+        rs->program_counter += 2;
+    }
     return (0);
 }
 
