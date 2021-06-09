@@ -9,18 +9,19 @@
 #include "emu_def.h"
 #include "emu_chip8.h"
 
+#define EMU_ERR_BUFFER_SIZE 1024
+
 /*
  * Emulator variables
  */
 static emu_rom_type_t emu_rom_type;
-static uint8_t emu_ram[EMU_CHIP_8_RAM_SIZE];
 static emu_state_t emu_state;
-static draw_fct_t emu_draw_fct;
 static uint32_t emu_max_addr;
 static emu_parse_fct_t *emu_parse_fcts;
 static uint32_t emu_nb_inst;
 static uint16_t *emu_inst_data;
 static emu_exec_fct_t emu_exec_fct;
+static char emu_err_buffer[EMU_ERR_BUFFER_SIZE];
 
 /*
  * Emulator constants
@@ -89,11 +90,13 @@ emu_load_rom(char const *rom_path, emu_rom_type_t rom_type, char const **err)
     if (open_rom_file(rom_path, &rom_size, &rom_file, err)) {
         return (1);
     }
-    memset(emu_ram, 0, sizeof(uint8_t) * EMU_CHIP_8_RAM_SIZE);
-    memcpy(emu_ram,
+    memset(emu_state.ram, 0, sizeof(uint8_t) * EMU_CHIP8_RAM_SIZE);
+    memcpy(emu_state.ram,
            emu_chip_8_fonts,
            sizeof(uint8_t) * EMU_NB_FONTS * EMU_CHIP_8_FONT_HEIGHT);
-    if (fread(emu_ram + EMU_RAM_ENTRY_POINT, rom_size, 1, rom_file) != 1) {
+    if (fread(
+          emu_state.ram + EMU_CHIP8_RAM_ENTRY_POINT, rom_size, 1, rom_file) !=
+        1) {
         fclose(rom_file);
         *err = "Failed to read Rom";
         return (1);
@@ -101,7 +104,7 @@ emu_load_rom(char const *rom_path, emu_rom_type_t rom_type, char const **err)
     fclose(rom_file);
 
     memset(&emu_state, 0, sizeof(emu_state_t));
-    emu_state.registers.program_counter = EMU_RAM_ENTRY_POINT;
+    emu_state.registers.program_counter = EMU_CHIP8_RAM_ENTRY_POINT;
     emu_rom_type = rom_type;
     if (rom_type == EMU_RT_CHIP_8) {
         emu_max_addr = EMU_CHIP8_MAX_PROG_RAM_ADDR;
@@ -130,7 +133,7 @@ emu_load_rom(char const *rom_path, emu_rom_type_t rom_type, char const **err)
 void
 emu_set_draw_fct(draw_fct_t ptr)
 {
-    emu_draw_fct = ptr;
+    emu_state.draw_fct = ptr;
 }
 
 int
@@ -180,23 +183,23 @@ emu_release_key(int key_value)
 int
 emu_fetch(char const **err)
 {
-    static char err_buffer[256];
-
     if (emu_state.registers.program_counter % 2) {
         printf("[WARN][FETCH]: PC (%x) not even aligned\n",
                emu_state.registers.program_counter);
     }
     if (emu_state.registers.program_counter >= emu_max_addr) {
-        snprintf(err_buffer,
-                 256,
-                 "Program counter is outside allowed range=%x. Max allowed=%x",
-                 emu_state.registers.program_counter,
-                 emu_max_addr);
-        *err = err_buffer;
+        snprintf(
+          emu_err_buffer,
+          EMU_ERR_BUFFER_SIZE,
+          "Program counter is outside allowed range=0x%x. Max allowed=0x%x",
+          emu_state.registers.program_counter,
+          emu_max_addr);
+        *err = emu_err_buffer;
         emu_inst_data = NULL;
         return (1);
     }
-    emu_inst_data = (uint16_t *)&emu_ram[emu_state.registers.program_counter];
+    emu_inst_data =
+      (uint16_t *)&emu_state.ram[emu_state.registers.program_counter];
     emu_state.registers.program_counter += 2;
     return (0);
 }
@@ -204,7 +207,6 @@ emu_fetch(char const **err)
 int
 emu_decode(char const **err)
 {
-    static char err_buffer[256];
     emu_inst_t inst = { .raw_data = *emu_inst_data };
 
     for (uint32_t i = 0; i < emu_nb_inst; ++i) {
@@ -212,11 +214,11 @@ emu_decode(char const **err)
             return (0);
         }
     }
-    snprintf(err_buffer,
-             256,
-             "Invalid OP code at PC = %x",
+    snprintf(emu_err_buffer,
+             EMU_ERR_BUFFER_SIZE,
+             "Invalid OP code at PC = 0x%x",
              emu_state.registers.program_counter);
-    *err = err_buffer;
+    *err = emu_err_buffer;
     return (1);
 }
 

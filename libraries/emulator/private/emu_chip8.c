@@ -1,6 +1,7 @@
 #include "emu_chip8.h"
 
-#include <stddef.h>
+#include <string.h>
+#include <stdio.h>
 
 #include "emu_state.h"
 
@@ -41,6 +42,14 @@ emu_parse_fct_t g_chip8_parse_fcts[EMU_CHIP8_NB_INST] = {
     chip8_is_ld_store_register,
     chip8_is_ld_read_register
 };
+
+typedef int (*chip8_draw_fct)(void const *);
+
+/*
+ * Error buffer
+ */
+#define CHIP8_ERROR_BUFFER_SIZE 1024
+static char chip8_err_buffer[CHIP8_ERROR_BUFFER_SIZE];
 
 /*
  * Chip8 Inst Detection fct
@@ -379,6 +388,9 @@ chip8_is_ld_read_register(emu_inst_t inst)
 int
 chip8_exec_sys(emu_inst_t inst, void *state, char const **err)
 {
+    /*
+     * Ignored instruction
+     */
     (void)inst;
     (void)state;
     (void)err;
@@ -389,8 +401,12 @@ int
 chip8_exec_cls(emu_inst_t inst, void *state, char const **err)
 {
     (void)inst;
-    (void)state;
     (void)err;
+    emu_state_t *emu_state = state;
+    chip8_draw_fct draw_fct = emu_state->draw_fct;
+
+    memset(emu_state->framebuffer, 0, EMU_FRAMEBUFFER_SIZE);
+    (draw_fct)(emu_state->framebuffer);
     return (0);
 }
 
@@ -398,8 +414,19 @@ int
 chip8_exec_ret(emu_inst_t inst, void *state, char const **err)
 {
     (void)inst;
-    (void)state;
-    (void)err;
+    emu_state_t *emu_state = state;
+
+    if (!emu_state->registers.current_stack) {
+        snprintf(chip8_err_buffer,
+                 CHIP8_ERROR_BUFFER_SIZE,
+                 "RET at %x on empty stack pointer",
+                 emu_state->registers.program_counter);
+        *err = chip8_err_buffer;
+        return (1);
+    }
+    emu_state->registers.program_counter =
+      emu_state->registers.stack_pointer[emu_state->registers.current_stack];
+    emu_state->registers.current_stack -= 1;
     return (0);
 }
 
