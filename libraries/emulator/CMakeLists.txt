@@ -12,5 +12,5 @@ target_include_directories(emulator
 set_target_properties(emulator PROPERTIES
         C_STANDARD 11
         C_STANDARD_REQUIRED YES
-        C_EXTENSIONS NO)
+        C_EXTENSIONS GNU)
 target_compile_options(emulator PRIVATE -Wall -Wextra -Werror)

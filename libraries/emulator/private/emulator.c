@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
+#include <time.h>
 
 #include "emu_state.h"
 #include "emu_inst.h"
@@ -126,6 +128,7 @@ emu_load_rom(char const *rom_path, emu_rom_type_t rom_type, char const **err)
         emu_rom_type = EMU_RT_NONE;
         return (1);
     }
+    srand48(time(NULL));
     return (0);
 }
 
@@ -182,6 +185,9 @@ emu_release_key(int key_value)
 int
 emu_fetch(char const **err)
 {
+    if (emu_state.registers.skip_fetch) {
+        return (0);
+    }
     if (emu_state.registers.program_counter % 2) {
         printf("[WARN][FETCH]: PC (%x) not even aligned\n",
                emu_state.registers.program_counter);
