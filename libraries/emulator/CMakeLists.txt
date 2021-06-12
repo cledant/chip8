@@ -3,7 +3,7 @@ project(lib_emulator)
 
 add_library(emulator STATIC
         private/emulator.c
-        private/emu_chip8.c private/emu_state.h private/emu_fb.h)
+        private/emu_chip8.c private/emu_state.h private/emu_fb.h private/emu_inst.c)
 target_include_directories(emulator
         PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/public

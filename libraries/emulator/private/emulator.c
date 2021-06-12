@@ -19,7 +19,7 @@ static emu_state_t emu_state;
 static uint32_t emu_max_addr;
 static emu_parse_fct_t *emu_parse_fcts;
 static uint32_t emu_nb_inst;
-static uint16_t *emu_inst_data;
+static emu_inst_t emu_curr_inst;
 static emu_exec_fct_t emu_exec_fct;
 static char emu_err_buffer[EMU_ERR_BUFFER_SIZE];
 
@@ -90,20 +90,19 @@ emu_load_rom(char const *rom_path, emu_rom_type_t rom_type, char const **err)
     if (open_rom_file(rom_path, &rom_size, &rom_file, err)) {
         return (1);
     }
-    memset(emu_state.ram, 0, sizeof(uint8_t) * EMU_CHIP8_RAM_SIZE);
+    memset(&emu_state, 0, sizeof(emu_state_t));
     memcpy(emu_state.ram,
            emu_chip_8_fonts,
            sizeof(uint8_t) * EMU_NB_FONTS * EMU_CHIP_8_FONT_HEIGHT);
     if (fread(
-          emu_state.ram + EMU_CHIP8_RAM_ENTRY_POINT, rom_size, 1, rom_file) !=
-        1) {
+          emu_state.ram + EMU_CHIP8_RAM_ENTRY_POINT, 1, rom_size, rom_file) !=
+        (size_t)rom_size) {
         fclose(rom_file);
         *err = "Failed to read Rom";
         return (1);
     }
     fclose(rom_file);
 
-    memset(&emu_state, 0, sizeof(emu_state_t));
     emu_state.registers.program_counter = EMU_CHIP8_RAM_ENTRY_POINT;
     emu_rom_type = rom_type;
     if (rom_type == EMU_RT_CHIP_8) {
@@ -195,11 +194,16 @@ emu_fetch(char const **err)
           emu_state.registers.program_counter,
           emu_max_addr);
         *err = emu_err_buffer;
-        emu_inst_data = NULL;
+        emu_curr_inst = (emu_inst_t){ .n1 = 0, .n2 = 0, .n3 = 0, .n4 = 0 };
         return (1);
     }
-    emu_inst_data =
+
+    uint16_t *ram_data =
       (uint16_t *)&emu_state.ram[emu_state.registers.program_counter];
+    emu_curr_inst.n1 = ((*ram_data & 0x00F0) >> 4);
+    emu_curr_inst.n2 = ((*ram_data & 0x000F));
+    emu_curr_inst.n3 = ((*ram_data & 0xF000) >> 12);
+    emu_curr_inst.n4 = ((*ram_data & 0x0F00) >> 8);
     emu_state.registers.program_counter += 2;
     return (0);
 }
@@ -207,17 +211,15 @@ emu_fetch(char const **err)
 int
 emu_decode(char const **err)
 {
-    emu_inst_t inst = { .raw_data = *emu_inst_data };
-
     for (uint32_t i = 0; i < emu_nb_inst; ++i) {
-        if ((emu_exec_fct = ((g_chip8_parse_fcts)[i])(inst))) {
+        if ((emu_exec_fct = ((g_chip8_parse_fcts)[i])(emu_curr_inst))) {
             return (0);
         }
     }
     snprintf(emu_err_buffer,
              EMU_ERR_BUFFER_SIZE,
              "Invalid OP code at PC = 0x%x",
-             emu_state.registers.program_counter);
+             emu_state.registers.program_counter - 2);
     *err = emu_err_buffer;
     return (1);
 }
@@ -226,9 +228,7 @@ int
 emu_execute(char const **err)
 {
     if (emu_exec_fct) {
-        emu_inst_t inst = { .raw_data = *emu_inst_data };
-
-        int ret = (emu_exec_fct)(inst, &emu_state, err);
+        int ret = (emu_exec_fct)(emu_curr_inst, &emu_state, err);
         emu_exec_fct = NULL;
         return (ret);
     }

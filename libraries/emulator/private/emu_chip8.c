@@ -57,7 +57,7 @@ static char chip8_err_buffer[CHIP8_ERROR_BUFFER_SIZE];
 emu_exec_fct_t
 chip8_is_sys(emu_inst_t inst)
 {
-    if (inst.nibbles.n1 == 0x0) {
+    if (inst.n1 == 0x0) {
         return (chip8_exec_sys);
     }
     return (NULL);
@@ -66,8 +66,7 @@ chip8_is_sys(emu_inst_t inst)
 emu_exec_fct_t
 chip8_is_cls(emu_inst_t inst)
 {
-    if (inst.nibbles.n1 == 0x0 && inst.nibbles.n2 == 0x0 &&
-        inst.nibbles.n3 == 0xE && inst.nibbles.n4 == 0x0) {
+    if (inst.n1 == 0x0 && inst.n2 == 0x0 && inst.n3 == 0xE && inst.n4 == 0x0) {
         return (chip8_exec_cls);
     }
     return (NULL);
@@ -76,8 +75,7 @@ chip8_is_cls(emu_inst_t inst)
 emu_exec_fct_t
 chip8_is_ret(emu_inst_t inst)
 {
-    if (inst.nibbles.n1 == 0x0 && inst.nibbles.n2 == 0x0 &&
-        inst.nibbles.n3 == 0xE && inst.nibbles.n4 == 0xE) {
+    if (inst.n1 == 0x0 && inst.n2 == 0x0 && inst.n3 == 0xE && inst.n4 == 0xE) {
         return (chip8_exec_ret);
     }
     return (NULL);
@@ -86,7 +84,7 @@ chip8_is_ret(emu_inst_t inst)
 emu_exec_fct_t
 chip8_is_jp_addr(emu_inst_t inst)
 {
-    if (inst.nibbles.n1 == 0x1) {
+    if (inst.n1 == 0x1) {
         return (chip8_exec_jp_addr);
     }
     return (NULL);
@@ -95,7 +93,7 @@ chip8_is_jp_addr(emu_inst_t inst)
 emu_exec_fct_t
 chip8_is_call(emu_inst_t inst)
 {
-    if (inst.nibbles.n1 == 0x2) {
+    if (inst.n1 == 0x2) {
         return (chip8_exec_call);
     }
     return (NULL);
@@ -104,7 +102,7 @@ chip8_is_call(emu_inst_t inst)
 emu_exec_fct_t
 chip8_is_se_register_byte(emu_inst_t inst)
 {
-    if (inst.nibbles.n1 == 0x3) {
+    if (inst.n1 == 0x3) {
         return (chip8_exec_se_register_byte);
     }
     return (NULL);
@@ -113,7 +111,7 @@ chip8_is_se_register_byte(emu_inst_t inst)
 emu_exec_fct_t
 chip8_is_sne_register_byte(emu_inst_t inst)
 {
-    if (inst.nibbles.n1 == 0x4) {
+    if (inst.n1 == 0x4) {
         return (chip8_exec_sne_register_byte);
     }
     return (NULL);
@@ -122,7 +120,7 @@ chip8_is_sne_register_byte(emu_inst_t inst)
 emu_exec_fct_t
 chip8_is_se_register_register(emu_inst_t inst)
 {
-    if (inst.nibbles.n1 == 0x5) {
+    if (inst.n1 == 0x5) {
         return (chip8_exec_se_register_register);
     }
     return (NULL);
@@ -131,7 +129,7 @@ chip8_is_se_register_register(emu_inst_t inst)
 emu_exec_fct_t
 chip8_is_ld_register_byte(emu_inst_t inst)
 {
-    if (inst.nibbles.n1 == 0x6) {
+    if (inst.n1 == 0x6) {
         return (chip8_exec_ld_register_byte);
     }
     return (NULL);
@@ -140,7 +138,7 @@ chip8_is_ld_register_byte(emu_inst_t inst)
 emu_exec_fct_t
 chip8_is_add_register_byte(emu_inst_t inst)
 {
-    if (inst.nibbles.n1 == 0x7) {
+    if (inst.n1 == 0x7) {
         return (chip8_exec_add_register_byte);
     }
     return (NULL);
@@ -149,7 +147,7 @@ chip8_is_add_register_byte(emu_inst_t inst)
 emu_exec_fct_t
 chip8_is_ld_register_register(emu_inst_t inst)
 {
-    if (inst.nibbles.n1 == 0x8 && inst.nibbles.n4 == 0x0) {
+    if (inst.n1 == 0x8 && inst.n4 == 0x0) {
         return (chip8_exec_ld_register_register);
     }
     return (NULL);
@@ -158,7 +156,7 @@ chip8_is_ld_register_register(emu_inst_t inst)
 emu_exec_fct_t
 chip8_is_or(emu_inst_t inst)
 {
-    if (inst.nibbles.n1 == 0x8 && inst.nibbles.n4 == 0x1) {
+    if (inst.n1 == 0x8 && inst.n4 == 0x1) {
         return (chip8_exec_or);
     }
     return (NULL);
@@ -167,7 +165,7 @@ chip8_is_or(emu_inst_t inst)
 emu_exec_fct_t
 chip8_is_and(emu_inst_t inst)
 {
-    if (inst.nibbles.n1 == 0x8 && inst.nibbles.n4 == 0x2) {
+    if (inst.n1 == 0x8 && inst.n4 == 0x2) {
         return (chip8_exec_and);
     }
     return (NULL);
@@ -176,7 +174,7 @@ chip8_is_and(emu_inst_t inst)
 emu_exec_fct_t
 chip8_is_xor(emu_inst_t inst)
 {
-    if (inst.nibbles.n1 == 0x8 && inst.nibbles.n4 == 0x3) {
+    if (inst.n1 == 0x8 && inst.n4 == 0x3) {
         return (chip8_exec_xor);
     }
     return (NULL);
@@ -185,7 +183,7 @@ chip8_is_xor(emu_inst_t inst)
 emu_exec_fct_t
 chip8_is_add_register_register(emu_inst_t inst)
 {
-    if (inst.nibbles.n1 == 0x8 && inst.nibbles.n4 == 0x4) {
+    if (inst.n1 == 0x8 && inst.n4 == 0x4) {
         return (chip8_exec_add_register_register);
     }
     return (NULL);
@@ -194,7 +192,7 @@ chip8_is_add_register_register(emu_inst_t inst)
 emu_exec_fct_t
 chip8_is_sub(emu_inst_t inst)
 {
-    if (inst.nibbles.n1 == 0x8 && inst.nibbles.n4 == 0x5) {
+    if (inst.n1 == 0x8 && inst.n4 == 0x5) {
         return (chip8_exec_sub);
     }
     return (NULL);
@@ -203,7 +201,7 @@ chip8_is_sub(emu_inst_t inst)
 emu_exec_fct_t
 chip8_is_shr(emu_inst_t inst)
 {
-    if (inst.nibbles.n1 == 0x8 && inst.nibbles.n4 == 0x6) {
+    if (inst.n1 == 0x8 && inst.n4 == 0x6) {
         return (chip8_exec_shr);
     }
     return (NULL);
@@ -212,7 +210,7 @@ chip8_is_shr(emu_inst_t inst)
 emu_exec_fct_t
 chip8_is_subn(emu_inst_t inst)
 {
-    if (inst.nibbles.n1 == 0x8 && inst.nibbles.n4 == 0x7) {
+    if (inst.n1 == 0x8 && inst.n4 == 0x7) {
         return (chip8_exec_subn);
     }
     return (NULL);
@@ -221,7 +219,7 @@ chip8_is_subn(emu_inst_t inst)
 emu_exec_fct_t
 chip8_is_shl(emu_inst_t inst)
 {
-    if (inst.nibbles.n1 == 0x8 && inst.nibbles.n4 == 0xE) {
+    if (inst.n1 == 0x8 && inst.n4 == 0xE) {
         return (chip8_exec_shl);
     }
     return (NULL);
@@ -230,7 +228,7 @@ chip8_is_shl(emu_inst_t inst)
 emu_exec_fct_t
 chip8_is_sne_register_register(emu_inst_t inst)
 {
-    if (inst.nibbles.n1 == 0x9 && inst.nibbles.n4 == 0x0) {
+    if (inst.n1 == 0x9 && inst.n4 == 0x0) {
         return (chip8_exec_sne_register_register);
     }
     return (NULL);
@@ -239,7 +237,7 @@ chip8_is_sne_register_register(emu_inst_t inst)
 emu_exec_fct_t
 chip8_is_ld_addr_register_addr(emu_inst_t inst)
 {
-    if (inst.nibbles.n1 == 0xA) {
+    if (inst.n1 == 0xA) {
         return (chip8_exec_ld_addr_register_addr);
     }
     return (NULL);
@@ -248,7 +246,7 @@ chip8_is_ld_addr_register_addr(emu_inst_t inst)
 emu_exec_fct_t
 chip8_is_jp_v0_addr(emu_inst_t inst)
 {
-    if (inst.nibbles.n1 == 0xB) {
+    if (inst.n1 == 0xB) {
         return (chip8_exec_jp_v0_addr);
     }
     return (NULL);
@@ -257,7 +255,7 @@ chip8_is_jp_v0_addr(emu_inst_t inst)
 emu_exec_fct_t
 chip8_is_rnd(emu_inst_t inst)
 {
-    if (inst.nibbles.n1 == 0xC) {
+    if (inst.n1 == 0xC) {
         return (chip8_exec_rnd);
     }
     return (NULL);
@@ -266,7 +264,7 @@ chip8_is_rnd(emu_inst_t inst)
 emu_exec_fct_t
 chip8_is_draw(emu_inst_t inst)
 {
-    if (inst.nibbles.n1 == 0xD) {
+    if (inst.n1 == 0xD) {
         return (chip8_exec_draw);
     }
     return (NULL);
@@ -275,8 +273,7 @@ chip8_is_draw(emu_inst_t inst)
 emu_exec_fct_t
 chip8_is_skp(emu_inst_t inst)
 {
-    if (inst.nibbles.n1 == 0xE && inst.nibbles.n3 == 0x9 &&
-        inst.nibbles.n4 == 0xE) {
+    if (inst.n1 == 0xE && inst.n3 == 0x9 && inst.n4 == 0xE) {
         return (chip8_exec_skp);
     }
     return (NULL);
@@ -285,8 +282,7 @@ chip8_is_skp(emu_inst_t inst)
 emu_exec_fct_t
 chip8_is_sknp(emu_inst_t inst)
 {
-    if (inst.nibbles.n1 == 0xE && inst.nibbles.n3 == 0xA &&
-        inst.nibbles.n4 == 0x1) {
+    if (inst.n1 == 0xE && inst.n3 == 0xA && inst.n4 == 0x1) {
         return (chip8_exec_sknp);
     }
     return (NULL);
@@ -295,8 +291,7 @@ chip8_is_sknp(emu_inst_t inst)
 emu_exec_fct_t
 chip8_is_ld_register_delay(emu_inst_t inst)
 {
-    if (inst.nibbles.n1 == 0xF && inst.nibbles.n3 == 0x0 &&
-        inst.nibbles.n4 == 0x7) {
+    if (inst.n1 == 0xF && inst.n3 == 0x0 && inst.n4 == 0x7) {
         return (chip8_exec_ld_register_delay);
     }
     return (NULL);
@@ -305,8 +300,7 @@ chip8_is_ld_register_delay(emu_inst_t inst)
 emu_exec_fct_t
 chip8_is_ld_register_key(emu_inst_t inst)
 {
-    if (inst.nibbles.n1 == 0xF && inst.nibbles.n3 == 0x0 &&
-        inst.nibbles.n4 == 0xA) {
+    if (inst.n1 == 0xF && inst.n3 == 0x0 && inst.n4 == 0xA) {
         return (chip8_exec_ld_register_key);
     }
     return (NULL);
@@ -315,8 +309,7 @@ chip8_is_ld_register_key(emu_inst_t inst)
 emu_exec_fct_t
 chip8_is_ld_delay_register(emu_inst_t inst)
 {
-    if (inst.nibbles.n1 == 0xF && inst.nibbles.n3 == 0x1 &&
-        inst.nibbles.n4 == 0x5) {
+    if (inst.n1 == 0xF && inst.n3 == 0x1 && inst.n4 == 0x5) {
         return (chip8_exec_ld_delay_register);
     }
     return (NULL);
@@ -325,8 +318,7 @@ chip8_is_ld_delay_register(emu_inst_t inst)
 emu_exec_fct_t
 chip8_is_ld_sound_register(emu_inst_t inst)
 {
-    if (inst.nibbles.n1 == 0xF && inst.nibbles.n3 == 0x1 &&
-        inst.nibbles.n4 == 0x8) {
+    if (inst.n1 == 0xF && inst.n3 == 0x1 && inst.n4 == 0x8) {
         return (chip8_exec_ld_sound_register);
     }
     return (NULL);
@@ -335,8 +327,7 @@ chip8_is_ld_sound_register(emu_inst_t inst)
 emu_exec_fct_t
 chip8_is_add_addr_register_register(emu_inst_t inst)
 {
-    if (inst.nibbles.n1 == 0xF && inst.nibbles.n3 == 0x1 &&
-        inst.nibbles.n4 == 0xE) {
+    if (inst.n1 == 0xF && inst.n3 == 0x1 && inst.n4 == 0xE) {
         return (chip8_exec_add_addr_register_register);
     }
     return (NULL);
@@ -345,8 +336,7 @@ chip8_is_add_addr_register_register(emu_inst_t inst)
 emu_exec_fct_t
 chip8_is_ld_font_addr_addr_register(emu_inst_t inst)
 {
-    if (inst.nibbles.n1 == 0xF && inst.nibbles.n3 == 0x2 &&
-        inst.nibbles.n4 == 0x9) {
+    if (inst.n1 == 0xF && inst.n3 == 0x2 && inst.n4 == 0x9) {
         return (chip8_exec_ld_font_addr_addr_register);
     }
     return (NULL);
@@ -355,8 +345,7 @@ chip8_is_ld_font_addr_addr_register(emu_inst_t inst)
 emu_exec_fct_t
 chip8_is_ld_bcd_addr(emu_inst_t inst)
 {
-    if (inst.nibbles.n1 == 0xF && inst.nibbles.n3 == 0x3 &&
-        inst.nibbles.n4 == 0x3) {
+    if (inst.n1 == 0xF && inst.n3 == 0x3 && inst.n4 == 0x3) {
         return (chip8_exec_ld_bcd_addr);
     }
     return (NULL);
@@ -365,8 +354,7 @@ chip8_is_ld_bcd_addr(emu_inst_t inst)
 emu_exec_fct_t
 chip8_is_ld_store_register(emu_inst_t inst)
 {
-    if (inst.nibbles.n1 == 0xF && inst.nibbles.n3 == 0x5 &&
-        inst.nibbles.n4 == 0x5) {
+    if (inst.n1 == 0xF && inst.n3 == 0x5 && inst.n4 == 0x5) {
         return (chip8_exec_ld_store_register);
     }
     return (NULL);
@@ -375,8 +363,7 @@ chip8_is_ld_store_register(emu_inst_t inst)
 emu_exec_fct_t
 chip8_is_ld_read_register(emu_inst_t inst)
 {
-    if (inst.nibbles.n1 == 0xF && inst.nibbles.n3 == 0x6 &&
-        inst.nibbles.n4 == 0x5) {
+    if (inst.n1 == 0xF && inst.n3 == 0x6 && inst.n4 == 0x5) {
         return (chip8_exec_ld_read_register);
     }
     return (NULL);
@@ -409,7 +396,7 @@ chip8_exec_cls(emu_inst_t inst, void *state, char const **err)
         snprintf(chip8_err_buffer,
                  CHIP8_ERROR_BUFFER_SIZE,
                  "Renderer failed to draw CLS at 0x%x",
-                 es->registers.program_counter);
+                 es->registers.program_counter - 2);
         *err = chip8_err_buffer;
         return (1);
     }
@@ -427,7 +414,7 @@ chip8_exec_ret(emu_inst_t inst, void *state, char const **err)
         snprintf(chip8_err_buffer,
                  CHIP8_ERROR_BUFFER_SIZE,
                  "RET at %x on empty stack pointer",
-                 rs->program_counter);
+                 rs->program_counter - 2);
         *err = chip8_err_buffer;
         return (1);
     }
@@ -440,8 +427,9 @@ chip8_exec_jp_addr(emu_inst_t inst, void *state, char const **err)
 {
     (void)err;
     emu_state_t *es = state;
+    emu_inst_addr_t inst_addr = emu_inst_to_emu_inst_addr(inst);
 
-    es->registers.program_counter = inst.inst_addr.addr;
+    es->registers.program_counter = inst_addr.addr;
     return (0);
 }
 
@@ -463,9 +451,9 @@ chip8_exec_se_register_byte(emu_inst_t inst, void *state, char const **err)
     (void)err;
     emu_state_t *es = state;
     emu_registers_state_t *rs = &es->registers;
+    emu_inst_reg_uint8_t inst_reg_uint8 = emu_inst_to_emu_inst_reg_uint8(inst);
 
-    if (rs->general_registers[inst.inst_reg_uint8.gen_reg] ==
-        inst.inst_reg_uint8.value) {
+    if (rs->general_registers[inst_reg_uint8.gen_reg] == inst_reg_uint8.value) {
         rs->program_counter += 2;
     }
     return (0);
@@ -477,9 +465,9 @@ chip8_exec_sne_register_byte(emu_inst_t inst, void *state, char const **err)
     (void)err;
     emu_state_t *es = state;
     emu_registers_state_t *rs = &es->registers;
+    emu_inst_reg_uint8_t inst_reg_uint8 = emu_inst_to_emu_inst_reg_uint8(inst);
 
-    if (rs->general_registers[inst.inst_reg_uint8.gen_reg] !=
-        inst.inst_reg_uint8.value) {
+    if (rs->general_registers[inst_reg_uint8.gen_reg] != inst_reg_uint8.value) {
         rs->program_counter += 2;
     }
     return (0);
@@ -492,8 +480,8 @@ chip8_exec_se_register_register(emu_inst_t inst, void *state, char const **err)
     emu_state_t *es = state;
     emu_registers_state_t *rs = &es->registers;
 
-    if (rs->general_registers[inst.inst_reg_reg.gen_reg_x] ==
-        rs->general_registers[inst.inst_reg_reg.gen_reg_y]) {
+    if (rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_x] ==
+        rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_y]) {
         rs->program_counter += 2;
     }
     return (0);
@@ -502,72 +490,105 @@ chip8_exec_se_register_register(emu_inst_t inst, void *state, char const **err)
 int
 chip8_exec_ld_register_byte(emu_inst_t inst, void *state, char const **err)
 {
-    (void)inst;
-    (void)state;
     (void)err;
+    emu_state_t *es = state;
+    emu_registers_state_t *rs = &es->registers;
+    emu_inst_reg_uint8_t inst_reg_uint8 = emu_inst_to_emu_inst_reg_uint8(inst);
+
+    rs->general_registers[inst_reg_uint8.gen_reg] = inst_reg_uint8.value;
     return (0);
 }
 
 int
 chip8_exec_add_register_byte(emu_inst_t inst, void *state, char const **err)
 {
-    (void)inst;
-    (void)state;
     (void)err;
+    emu_state_t *es = state;
+    emu_registers_state_t *rs = &es->registers;
+    emu_inst_reg_uint8_t inst_reg_uint8 = emu_inst_to_emu_inst_reg_uint8(inst);
+
+    rs->general_registers[inst_reg_uint8.gen_reg] += inst_reg_uint8.value;
     return (0);
 }
 
 int
 chip8_exec_ld_register_register(emu_inst_t inst, void *state, char const **err)
 {
-    (void)inst;
-    (void)state;
     (void)err;
+    emu_state_t *es = state;
+    emu_registers_state_t *rs = &es->registers;
+
+    rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_x] =
+      rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_y];
     return (0);
 }
 
 int
 chip8_exec_or(emu_inst_t inst, void *state, char const **err)
 {
-    (void)inst;
-    (void)state;
     (void)err;
+    emu_state_t *es = state;
+    emu_registers_state_t *rs = &es->registers;
+
+    rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_x] |=
+      rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_y];
     return (0);
 }
 
 int
 chip8_exec_and(emu_inst_t inst, void *state, char const **err)
 {
-    (void)inst;
-    (void)state;
     (void)err;
+    emu_state_t *es = state;
+    emu_registers_state_t *rs = &es->registers;
+
+    rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_x] &=
+      rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_y];
     return (0);
 }
 
 int
 chip8_exec_xor(emu_inst_t inst, void *state, char const **err)
 {
-    (void)inst;
-    (void)state;
     (void)err;
+    emu_state_t *es = state;
+    emu_registers_state_t *rs = &es->registers;
+
+    rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_x] ^=
+      rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_y];
     return (0);
 }
 
 int
 chip8_exec_add_register_register(emu_inst_t inst, void *state, char const **err)
 {
-    (void)inst;
-    (void)state;
     (void)err;
+    emu_state_t *es = state;
+    emu_registers_state_t *rs = &es->registers;
+
+    uint16_t add =
+      rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_x] +
+      rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_y];
+    rs->general_registers[0xF] = (add > 255) ? 1 : 0;
+    rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_x] =
+      0x00FF & add;
     return (0);
 }
 
 int
 chip8_exec_sub(emu_inst_t inst, void *state, char const **err)
 {
-    (void)inst;
-    (void)state;
     (void)err;
+    emu_state_t *es = state;
+    emu_registers_state_t *rs = &es->registers;
+
+    rs->general_registers[0xF] =
+      (rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_x] >
+       rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_y])
+        ? 1
+        : 0;
+    rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_x] -=
+      rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_y];
     return (0);
 }
 
@@ -605,8 +626,8 @@ chip8_exec_sne_register_register(emu_inst_t inst, void *state, char const **err)
     emu_state_t *es = state;
     emu_registers_state_t *rs = &es->registers;
 
-    if (rs->general_registers[inst.inst_reg_reg.gen_reg_x] !=
-        rs->general_registers[inst.inst_reg_reg.gen_reg_y]) {
+    if (rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_x] !=
+        rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_y]) {
         rs->program_counter += 2;
     }
     return (0);

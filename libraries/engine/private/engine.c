@@ -1,6 +1,7 @@
 #include "engine.h"
 
 #include <stdio.h>
+#include <unistd.h>
 
 #include "emulator.h"
 #include "input.h"
