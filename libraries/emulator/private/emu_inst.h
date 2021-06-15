@@ -43,6 +43,14 @@ typedef struct s_emu_inst_reg_reg
     uint8_t op_code_2;
 } emu_inst_reg_reg_t;
 
+typedef struct s_emu_inst_draw
+{
+    uint8_t op_code;
+    uint8_t x;
+    uint8_t y;
+    uint8_t size;
+} emu_inst_draw_t;
+
 /*
  * Types
  */

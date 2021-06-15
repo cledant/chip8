@@ -7,12 +7,6 @@
 #define EMU_SUPER_CHIP8_MAX_PROG_RAM_ADDR (0xFFF - 1)
 
 /*
- * Sizes
- */
-#define EMU_CHIP_8_FONT_HEIGHT 5
-#define EMU_NB_FONTS 16
-
-/*
  * Other
  */
 #define EMU_KEY_PRESSED 1

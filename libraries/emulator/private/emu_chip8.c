@@ -392,11 +392,11 @@ chip8_exec_cls(emu_inst_t inst, void *state, char const **err)
     emu_state_t *es = state;
     chip8_draw_fct draw_fct = es->draw_fct;
 
-    memset(es->framebuffer, 0, EMU_FRAMEBUFFER_SIZE);
+    memset(es->framebuffer, 0, EMU_FRAMEBUFFER_MAX_SIZE);
     if ((draw_fct)(es->framebuffer)) {
         snprintf(chip8_err_buffer,
                  CHIP8_ERROR_BUFFER_SIZE,
-                 "Renderer failed to draw CLS at 0x%x",
+                 "Renderer failed to CLS at 0x%x",
                  es->registers.program_counter - 2);
         *err = chip8_err_buffer;
         return (1);
@@ -596,10 +596,13 @@ chip8_exec_sub(emu_inst_t inst, void *state, char const **err)
 int
 chip8_exec_shr(emu_inst_t inst, void *state, char const **err)
 {
-    // TODO SHR
-    (void)inst;
-    (void)state;
     (void)err;
+    emu_state_t *es = state;
+    emu_registers_state_t *rs = &es->registers;
+
+    rs->general_registers[0xF] =
+      (rs->general_registers[inst.n2] & 0b00000001) ? 1 : 0;
+    rs->general_registers[inst.n2] /= 2;
     return (0);
 }
 
@@ -623,10 +626,13 @@ chip8_exec_subn(emu_inst_t inst, void *state, char const **err)
 int
 chip8_exec_shl(emu_inst_t inst, void *state, char const **err)
 {
-    // TODO SHL
-    (void)inst;
-    (void)state;
     (void)err;
+    emu_state_t *es = state;
+    emu_registers_state_t *rs = &es->registers;
+
+    rs->general_registers[0xF] =
+      (rs->general_registers[inst.n2] & 0xb10000000) ? 1 : 0;
+    rs->general_registers[inst.n2] *= 2;
     return (0);
 }
 
@@ -685,10 +691,44 @@ chip8_exec_rnd(emu_inst_t inst, void *state, char const **err)
 int
 chip8_exec_draw(emu_inst_t inst, void *state, char const **err)
 {
-    // TODO DRAW
-    (void)inst;
-    (void)state;
-    (void)err;
+    emu_state_t *es = state;
+    chip8_draw_fct draw_fct = es->draw_fct;
+    emu_registers_state_t *rs = &es->registers;
+
+    uint8_t size_to_copy = ((emu_inst_draw_t *)&inst)->size;
+    uint8_t pos_w = rs->general_registers[((emu_inst_draw_t *)&inst)->x];
+    uint8_t pos_h = rs->general_registers[((emu_inst_draw_t *)&inst)->y];
+    rs->general_registers[0xF] = 0;
+    for (uint8_t i = 0; i < size_to_copy; ++i) {
+        for (uint8_t j = 0; j < 8; ++j) {
+            int32_t write_pos_w = ((pos_w + j) % EMU_CHIP8_W);
+            int32_t write_pos_h = ((pos_h + i) % EMU_CHIP8_H);
+
+            int32_t fb_bit_pos = (write_pos_w + EMU_CHIP8_W * write_pos_h) / 8;
+            int32_t fb_bit_offset =
+              (write_pos_w + EMU_CHIP8_W * write_pos_h) % 8;
+
+            uint8_t data = es->ram[rs->address_register + i];
+            uint8_t sprite_bit = (data & (1 << (8 - j))) >> (8 - j);
+            uint8_t fb_bit =
+              (es->framebuffer[fb_bit_pos] & (1 << fb_bit_offset)) >>
+              fb_bit_offset;
+
+            if (sprite_bit && fb_bit) {
+                rs->general_registers[0xF] = 1;
+            }
+            es->framebuffer[fb_bit_pos] ^= (sprite_bit << fb_bit_offset);
+        }
+    }
+
+    if ((draw_fct)(es->framebuffer)) {
+        snprintf(chip8_err_buffer,
+                 CHIP8_ERROR_BUFFER_SIZE,
+                 "Renderer failed to DRW at 0x%x",
+                 es->registers.program_counter - 2);
+        *err = chip8_err_buffer;
+        return (1);
+    }
     return (0);
 }
 
@@ -795,10 +835,11 @@ chip8_exec_ld_font_addr_addr_register(emu_inst_t inst,
                                       void *state,
                                       char const **err)
 {
-    // TODO LD
-    (void)inst;
-    (void)state;
     (void)err;
+    emu_state_t *es = state;
+    emu_registers_state_t *rs = &es->registers;
+
+    rs->address_register += es->ram[inst.n2 * EMU_CHIP_8_FONT_HEIGHT];
     return (0);
 }
 

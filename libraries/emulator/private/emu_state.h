@@ -19,6 +19,8 @@
 #define EMU_MAX_GENERAL_REGISTERS 16
 #define EMU_NB_KEYS 16
 #define EMU_CHIP8_MAX_ROM_SIZE (EMU_CHIP8_RAM_SIZE - EMU_CHIP8_RAM_ENTRY_POINT)
+#define EMU_CHIP_8_FONT_HEIGHT 5
+#define EMU_NB_FONTS 16
 
 /*
  * Structs
@@ -39,7 +41,7 @@ typedef struct s_emu_state
 {
     emu_registers_state_t registers;
     int32_t keys_state[EMU_NB_KEYS];
-    uint8_t framebuffer[EMU_FRAMEBUFFER_SIZE];
+    uint8_t framebuffer[EMU_FRAMEBUFFER_MAX_SIZE];
     uint8_t ram[EMU_CHIP8_RAM_SIZE];
     void *draw_fct;
 } emu_state_t;
