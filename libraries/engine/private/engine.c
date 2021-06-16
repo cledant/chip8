@@ -38,6 +38,7 @@ engine_loop()
     char const *err = NULL;
 
     while (!should_close) {
+        // TODO Delay + Sound register decrement
         if (input_get(&err)) {
             printf("[FATAL][INPUT]: %s\n", err);
             return (1);

@@ -441,8 +441,10 @@ chip8_exec_call(emu_inst_t inst, void *state, char const **err)
     (void)inst;
     emu_state_t *es = state;
     emu_registers_state_t *rs = &es->registers;
+    emu_inst_addr_t inst_addr = emu_inst_to_emu_inst_addr(inst);
 
-    rs->stack_pointer[rs->current_stack++] = rs->program_counter;
+    rs->stack_pointer[++rs->current_stack] = rs->program_counter;
+    rs->program_counter = inst_addr.addr;
     return (0);
 }
 
@@ -708,8 +710,8 @@ chip8_exec_draw(emu_inst_t inst, void *state, char const **err)
             int32_t fb_bit_offset =
               (write_pos_w + EMU_CHIP8_W * write_pos_h) % 8;
 
-            uint8_t data = es->ram[rs->address_register + i];
-            uint8_t sprite_bit = (data & (1 << (8 - j))) >> (8 - j);
+            uint8_t sprite_bit =
+              (es->ram[rs->address_register + i] & (1 << (8 - j))) >> (8 - j);
             uint8_t fb_bit =
               (es->framebuffer[fb_bit_pos] & (1 << fb_bit_offset)) >>
               fb_bit_offset;
@@ -720,7 +722,6 @@ chip8_exec_draw(emu_inst_t inst, void *state, char const **err)
             es->framebuffer[fb_bit_pos] ^= (sprite_bit << fb_bit_offset);
         }
     }
-
     if ((draw_fct)(es->framebuffer)) {
         snprintf(chip8_err_buffer,
                  CHIP8_ERROR_BUFFER_SIZE,
@@ -851,9 +852,11 @@ chip8_exec_ld_bcd_addr(emu_inst_t inst, void *state, char const **err)
     emu_registers_state_t *rs = &es->registers;
 
     uint8_t divisor = 100;
+    uint8_t count = 0;
     for (uint8_t i = 0; i < 3; ++i) {
         es->ram[rs->address_register + i] =
-          rs->general_registers[inst.n2] / divisor;
+          (rs->general_registers[inst.n2] - count) / divisor;
+        count += es->ram[rs->address_register + i] * divisor;
         divisor /= 10;
     }
     return (0);
@@ -866,8 +869,7 @@ chip8_exec_ld_store_register(emu_inst_t inst, void *state, char const **err)
     emu_state_t *es = state;
     emu_registers_state_t *rs = &es->registers;
 
-    uint8_t val = inst.n2 % 16;
-    for (uint8_t i = 0; i < val; ++i) {
+    for (uint8_t i = 0; i <= inst.n2; ++i) {
         es->ram[rs->address_register + i] = rs->general_registers[i];
     }
     return (0);
@@ -880,8 +882,7 @@ chip8_exec_ld_read_register(emu_inst_t inst, void *state, char const **err)
     emu_state_t *es = state;
     emu_registers_state_t *rs = &es->registers;
 
-    uint8_t val = inst.n2 % 16;
-    for (uint8_t i = 0; i < val; ++i) {
+    for (uint8_t i = 0; i <= inst.n2; ++i) {
         rs->general_registers[i] = es->ram[rs->address_register + i];
     }
     return (0);
