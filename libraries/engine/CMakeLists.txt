@@ -12,6 +12,6 @@ set_target_properties(engine PROPERTIES
         C_STANDARD 11
         C_STANDARD_REQUIRED YES
         C_EXTENSIONS NO)
-target_link_libraries(engine input event_buffer emulator renderer)
-add_dependencies(engine input event_buffer emulator renderer)
+target_link_libraries(engine input event_buffer emulator renderer tools)
+add_dependencies(engine input event_buffer emulator renderer tools)
 target_compile_options(engine PRIVATE -Wall -Wextra -Werror)

@@ -8,9 +8,11 @@
 
 #include "emu_state.h"
 #include "emu_inst.h"
-#include "emu_def.h"
 #include "emu_chip8.h"
+#include "tools.h"
 
+#define EMU_KEY_PRESSED 1
+#define EMU_KEY_RELEASED 0
 #define EMU_ERR_BUFFER_SIZE 1024
 
 /*
@@ -38,10 +40,16 @@ static uint8_t const emu_chip_8_fonts[EMU_NB_FONTS][EMU_CHIP_8_FONT_HEIGHT] = {
     { 0xF0, 0x80, 0x80, 0x80, 0xF0 }, { 0xE0, 0x90, 0x90, 0x90, 0xE0 },
     { 0xF0, 0x80, 0xF0, 0x80, 0xF0 }, { 0xF0, 0x80, 0xF0, 0x80, 0x80 }
 };
-static int const emu_key_values[EMU_NB_KEYS] = {
-    '1', '2', '3', '4', 'Q', 'W', 'E', 'R',
-    'A', 'S', 'D', 'F', 'Z', 'X', 'C', 'V',
-};
+/*
+ * CHIP8 KEYBOARD LAYOUT
+ * 1 | 2 | 3 | C
+ * 4 | 5 | 6 | D
+ * 7 | 8 | 9 | E
+ * A | 0 | B | F
+ */
+static int const emu_key_values[EMU_NB_KEYS] = { 'X', '1', '2', '3', 'Q', 'W',
+                                                 'E', 'A', 'S', 'D', 'Z', 'C',
+                                                 '4', 'R', 'F', 'V' };
 
 /*
  * Internal functions
@@ -132,12 +140,6 @@ emu_load_rom(char const *rom_path, emu_rom_type_t rom_type, char const **err)
     return (0);
 }
 
-void
-emu_set_draw_fct(draw_fct_t ptr)
-{
-    emu_state.draw_fct = ptr;
-}
-
 int
 emu_get_framebuffer_size(int32_t *w, int32_t *h)
 {
@@ -182,10 +184,27 @@ emu_release_key(int key_value)
     return (1);
 }
 
+void
+emu_handle_timers()
+{
+    double cur_time = tool_get_time();
+
+    if (emu_state.registers.delay_register &&
+        cur_time >= emu_state.next_delay_timer) {
+        --emu_state.registers.delay_register;
+        emu_state.next_delay_timer += (1.0 / EMU_DELAY_SOUND_RATE);
+    }
+    if (emu_state.registers.sound_register &&
+        cur_time >= emu_state.next_sound_timer) {
+        --emu_state.registers.sound_register;
+        emu_state.next_sound_timer += (1.0 / EMU_DELAY_SOUND_RATE);
+    }
+}
+
 int
 emu_fetch(char const **err)
 {
-    if (emu_state.registers.skip_fetch) {
+    if (emu_state.skip_fetch) {
         return (0);
     }
     if (emu_state.registers.program_counter % 2) {
@@ -239,4 +258,10 @@ emu_execute(char const **err)
         return (ret);
     }
     return (0);
+}
+
+void const *
+emu_get_framebuffer()
+{
+    return (emu_state.framebuffer);
 }

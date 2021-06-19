@@ -54,6 +54,7 @@ add_subdirectory(libraries/renderer)
 add_subdirectory(libraries/engine)
 add_subdirectory(libraries/input)
 add_subdirectory(libraries/event)
+add_subdirectory(libraries/tools)
 
 #Main binary
 add_executable(chip8_emu

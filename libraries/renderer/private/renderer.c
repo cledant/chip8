@@ -12,15 +12,22 @@ typedef struct s_renderer
     SDL_Window *win;
     SDL_Renderer *renderer;
     SDL_Texture *tex;
-    int32_t color_mod_rgb;
     int32_t fb_w;
     int32_t fb_h;
 } renderer_t;
+
+typedef enum e_color_type
+{
+    RDR_CT_BACKGROUND = 0,
+    RDR_CT_SPRITE,
+    RDR_CT_NB_COLOR,
+} color_type_t;
 
 /*
  * Renderer variables
  */
 static renderer_t rdr_env;
+static int32_t rdr_colors_rgb[RDR_CT_NB_COLOR] = { 0x222222, 0x009900 };
 
 /*
  * Internal functions
@@ -39,7 +46,7 @@ copy_emulator_fb(void const *one_bit_depth_fb)
     int32_t total_size = rdr_env.fb_h * rdr_env.fb_w;
     for (int32_t i = 0; i < total_size; ++i) {
         int32_t bit_value = ((1 << mask) & emu_buff[j]) >> mask;
-        tex_buff[i] = rdr_env.color_mod_rgb * bit_value;
+        tex_buff[i] = rdr_colors_rgb[bit_value];
         mask = (mask + 1) % 8;
         if (!mask) {
             ++j;
@@ -108,10 +115,7 @@ renderer_destroy_window()
 }
 
 int
-renderer_create_framebuffer(int32_t fb_w,
-                            int32_t fb_h,
-                            int32_t color_mod_rgb,
-                            char const **err)
+renderer_create_framebuffer(int32_t fb_w, int32_t fb_h, char const **err)
 {
     rdr_env.tex = SDL_CreateTexture(rdr_env.renderer,
                                     SDL_PIXELFORMAT_ARGB8888,
@@ -122,10 +126,23 @@ renderer_create_framebuffer(int32_t fb_w,
         *err = "Failed to create renderer texture";
         return (1);
     }
-    rdr_env.color_mod_rgb = color_mod_rgb;
     rdr_env.fb_w = fb_w;
     rdr_env.fb_h = fb_h;
     return (0);
+}
+
+void
+renderer_set_colors(int32_t background, int32_t sprite)
+{
+    rdr_colors_rgb[RDR_CT_BACKGROUND] = background;
+    rdr_colors_rgb[RDR_CT_SPRITE] = sprite;
+}
+
+void
+renderer_invert_background_color()
+{
+    rdr_colors_rgb[RDR_CT_BACKGROUND] =
+      ~(0xFFFFFF & rdr_colors_rgb[RDR_CT_BACKGROUND]);
 }
 
 int

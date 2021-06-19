@@ -5,7 +5,11 @@
 #include <stdlib.h>
 
 #include "emu_state.h"
+#include "tools.h"
 
+/*
+ * emu_chip8 variables
+ */
 emu_parse_fct_t g_chip8_parse_fcts[EMU_CHIP8_NB_INST] = {
     chip8_is_cls,
     chip8_is_ret,
@@ -43,8 +47,6 @@ emu_parse_fct_t g_chip8_parse_fcts[EMU_CHIP8_NB_INST] = {
     chip8_is_ld_store_register,
     chip8_is_ld_read_register
 };
-
-typedef int (*chip8_draw_fct)(void const *);
 
 /*
  * Error buffer
@@ -389,18 +391,10 @@ int
 chip8_exec_cls(emu_inst_t inst, void *state, char const **err)
 {
     (void)inst;
+    (void)err;
     emu_state_t *es = state;
-    chip8_draw_fct draw_fct = es->draw_fct;
 
     memset(es->framebuffer, 0, EMU_FRAMEBUFFER_MAX_SIZE);
-    if ((draw_fct)(es->framebuffer)) {
-        snprintf(chip8_err_buffer,
-                 CHIP8_ERROR_BUFFER_SIZE,
-                 "Renderer failed to CLS at 0x%x",
-                 es->registers.program_counter - 2);
-        *err = chip8_err_buffer;
-        return (1);
-    }
     return (0);
 }
 
@@ -693,8 +687,8 @@ chip8_exec_rnd(emu_inst_t inst, void *state, char const **err)
 int
 chip8_exec_draw(emu_inst_t inst, void *state, char const **err)
 {
+    (void)err;
     emu_state_t *es = state;
-    chip8_draw_fct draw_fct = es->draw_fct;
     emu_registers_state_t *rs = &es->registers;
 
     uint8_t size_to_copy = ((emu_inst_draw_t *)&inst)->size;
@@ -721,14 +715,6 @@ chip8_exec_draw(emu_inst_t inst, void *state, char const **err)
             }
             es->framebuffer[fb_bit_pos] ^= (sprite_bit << fb_bit_offset);
         }
-    }
-    if ((draw_fct)(es->framebuffer)) {
-        snprintf(chip8_err_buffer,
-                 CHIP8_ERROR_BUFFER_SIZE,
-                 "Renderer failed to DRW at 0x%x",
-                 es->registers.program_counter - 2);
-        *err = chip8_err_buffer;
-        return (1);
     }
     return (0);
 }
@@ -787,12 +773,12 @@ chip8_exec_ld_register_key(emu_inst_t inst, void *state, char const **err)
 
     for (uint8_t i = 0; i < EMU_NB_KEYS; ++i) {
         if (es->keys_state[i]) {
-            es->registers.skip_fetch = 0;
+            es->skip_fetch = 0;
             rs->general_registers[inst.n2] = i;
             return (0);
         }
     }
-    es->registers.skip_fetch = 1;
+    es->skip_fetch = 1;
     return (0);
 }
 
@@ -804,6 +790,9 @@ chip8_exec_ld_delay_register(emu_inst_t inst, void *state, char const **err)
     emu_registers_state_t *rs = &es->registers;
 
     rs->delay_register = rs->general_registers[inst.n2];
+    if (rs->delay_register) {
+        es->next_delay_timer = tool_get_time() + (1.0 / EMU_DELAY_SOUND_RATE);
+    }
     return (0);
 }
 
@@ -815,6 +804,9 @@ chip8_exec_ld_sound_register(emu_inst_t inst, void *state, char const **err)
     emu_registers_state_t *rs = &es->registers;
 
     rs->sound_register = rs->general_registers[inst.n2];
+    if (rs->sound_register) {
+        es->next_sound_timer = tool_get_time() + (1.0 / EMU_DELAY_SOUND_RATE);
+    }
     return (0);
 }
 

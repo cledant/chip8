@@ -2,7 +2,6 @@
 #define CHIP8_EMU_EMU_INST_H
 
 #include <stdint.h>
-#include <assert.h>
 
 /*
  * Defines
