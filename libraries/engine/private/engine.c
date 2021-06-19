@@ -8,14 +8,15 @@
 #include "renderer.h"
 #include "tools.h"
 
-#define ENGINE_DEFAULT_DRAW_RATE 60
-#define ENGINE_DEFAULT_CYCLE_RATE 500
+#define ENGINE_DRAW_RATE 60
+#define ENGINE_DEFAULT_CYCLES_PER_FRAME 8
 
 static int eg_should_close;
 static int eg_should_draw;
 static int eg_should_cycle;
-static double eg_draw_tick = 1.0 / ENGINE_DEFAULT_DRAW_RATE;
-static double eg_cycle_tick = 1.0 / ENGINE_DEFAULT_CYCLE_RATE;
+static double const eg_draw_tick = 1.0 / ENGINE_DRAW_RATE;
+static double eg_cycle_tick =
+  1.0 / (ENGINE_DEFAULT_CYCLES_PER_FRAME * ENGINE_DRAW_RATE);
 static double eg_next_draw_timer;
 static double eg_next_cycle_timer;
 
@@ -58,10 +59,9 @@ handle_timers()
 }
 
 int
-engine_init(uint32_t refresh_rate, uint32_t cycle_rate)
+engine_init(uint32_t cycles_per_frame)
 {
-    eg_draw_tick = 1 / (double)refresh_rate;
-    eg_cycle_tick = 1 / (double)cycle_rate;
+    eg_cycle_tick = 1 / (double)(cycles_per_frame * ENGINE_DRAW_RATE);
     eg_next_draw_timer = tool_get_time();
     eg_next_cycle_timer = tool_get_time();
     return (0);
@@ -80,7 +80,6 @@ engine_loop()
         }
         process_event();
         handle_timers();
-        emu_handle_timers();
         if (eg_should_cycle) {
             if (emu_fetch(&err)) {
                 printf("[FATAL][FETCH]: %s\n", err);
@@ -97,6 +96,7 @@ engine_loop()
             eg_should_cycle = 0;
         }
         if (eg_should_draw) {
+            emu_decrement_timers();
             renderer_draw(emu_fb);
             eg_should_draw = 0;
         }

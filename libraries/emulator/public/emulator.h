@@ -19,7 +19,7 @@ int emu_load_rom(char const *rom_path,
 int emu_get_framebuffer_size(int32_t *w, int32_t *h);
 int emu_press_key(int32_t key_value);
 int emu_release_key(int32_t key_value);
-void emu_handle_timers();
+void emu_decrement_timers();
 int emu_fetch(char const **err);
 int emu_decode(char const **err);
 int emu_execute(char const **err);

@@ -117,6 +117,7 @@ main(int argc, char const **argv)
         shutdown(err);
         return (1);
     }
+    engine_init(20);
     engine_loop();
     shutdown(NULL);
     return (0);

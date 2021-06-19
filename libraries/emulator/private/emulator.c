@@ -185,20 +185,13 @@ emu_release_key(int key_value)
 }
 
 void
-emu_handle_timers()
+emu_decrement_timers()
 {
-    double cur_time = tool_get_time();
-
-    if (emu_state.registers.delay_register &&
-        cur_time >= emu_state.next_delay_timer) {
+    if (emu_state.registers.delay_register) {
         --emu_state.registers.delay_register;
-        emu_state.next_delay_timer += (1.0 / EMU_DELAY_SOUND_RATE);
     }
-    if (emu_state.registers.sound_register &&
-        cur_time >= emu_state.next_sound_timer) {
+    if (emu_state.registers.sound_register)
         --emu_state.registers.sound_register;
-        emu_state.next_sound_timer += (1.0 / EMU_DELAY_SOUND_RATE);
-    }
 }
 
 int
