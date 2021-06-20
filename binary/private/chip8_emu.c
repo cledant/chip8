@@ -22,7 +22,7 @@ show_help()
 {
     puts("./chip8_emu [-h | --help] ROM_FILEPATH ROM_TYPE [CYCLE_PER_FRAME] "
          "[SCALE]");
-    puts("\tROM TYPE can be CHIP8, CHIP8_HI_RES, SUPERCHIP8");
+    puts("\tROM TYPE can be CHIP8, SUPERCHIP8");
     puts("\tSUPERCHIP8 supported version is 1.1");
     puts("\tCYCLE_PER_FRAME: Emulation speed. Default is 30");
     puts("\tSCALE: Resolution scaling from original resolution. Default is 4");

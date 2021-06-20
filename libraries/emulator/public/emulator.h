@@ -7,7 +7,6 @@ typedef enum e_emu_rom_type
 {
     EMU_RT_NONE = 0,
     EMU_RT_CHIP_8,
-    EMU_RT_CHIP_8_HI_RES,
     EMU_RT_SUPER_CHIP_8,
     EMU_RT_NB_TYPES,
 } emu_rom_type_t;

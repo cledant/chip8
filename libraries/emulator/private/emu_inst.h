@@ -7,7 +7,6 @@
  * Defines
  */
 #define EMU_CHIP8_NB_INST 35
-#define EMU_CHIP8_HI_RES_NB_INST 37
 #define EMU_SUPER_CHIP8_NB_INST 39
 
 /*

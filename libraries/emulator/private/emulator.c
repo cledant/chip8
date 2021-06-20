@@ -86,7 +86,6 @@ open_rom_file(char const *rom_path,
  */
 char const *g_emu_rom_types_str[EMU_RT_NB_TYPES] = { "NONE",
                                                      "CHIP8",
-                                                     "CHIP8_HI_RES",
                                                      "SUPERCHIP8" };
 
 int
@@ -118,13 +117,6 @@ emu_load_rom(char const *rom_path, emu_rom_type_t rom_type, char const **err)
         emu_state.max_fb = EMU_CHIP8_FRAMEBUFFER_SIZE;
         emu_nb_inst = EMU_CHIP8_NB_INST;
         emu_parse_fcts = g_chip8_parse_fcts;
-    } else if (rom_type == EMU_RT_CHIP_8_HI_RES) {
-        emu_state.max_addr = EMU_CHIP8_MAX_PROG_RAM_ADDR;
-        emu_state.max_fb = EMU_CHIP8_FRAMEBUFFER_SIZE;
-        emu_nb_inst = EMU_CHIP8_HI_RES_NB_INST;
-        emu_parse_fcts = NULL;
-        *err = "Chip8 Hi Res not implemented yet";
-        return (1);
     } else if (rom_type == EMU_RT_SUPER_CHIP_8) {
         emu_state.max_addr = EMU_SUPER_CHIP8_MAX_PROG_RAM_ADDR;
         emu_state.max_fb = EMU_SUPER_CHIP8_FRAMEBUFFER_SIZE;
@@ -147,9 +139,6 @@ emu_get_framebuffer_size(int32_t *w, int32_t *h)
     if (emu_rom_type == EMU_RT_CHIP_8) {
         *w = EMU_CHIP8_W;
         *h = EMU_CHIP8_H;
-    } else if (emu_rom_type == EMU_RT_CHIP_8_HI_RES) {
-        *w = EMU_CHIP8_HI_RES_W;
-        *h = EMU_CHIP8_HI_RES_H;
     } else if (emu_rom_type == EMU_RT_SUPER_CHIP_8) {
         *w = EMU_SUPER_CHIP_8_W;
         *h = EMU_SUPER_CHIP_8_H;

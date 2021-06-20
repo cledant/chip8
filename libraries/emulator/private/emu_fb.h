@@ -6,8 +6,6 @@
  */
 #define EMU_CHIP8_W 64
 #define EMU_CHIP8_H 32
-#define EMU_CHIP8_HI_RES_W 64
-#define EMU_CHIP8_HI_RES_H 64
 #define EMU_SUPER_CHIP_8_W 128
 #define EMU_SUPER_CHIP_8_H 64
 
