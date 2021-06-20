@@ -27,7 +27,7 @@ typedef enum e_color_type
  * Renderer variables
  */
 static renderer_t rdr_env;
-static int32_t rdr_colors_rgb[RDR_CT_NB_COLOR] = { 0x222222, 0x009900 };
+static int32_t rdr_colors_rgb[RDR_CT_NB_COLOR] = { 0x222222, 0x00BB00 };
 
 /*
  * Internal functions

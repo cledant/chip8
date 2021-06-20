@@ -9,7 +9,6 @@
 #include "emu_state.h"
 #include "emu_inst.h"
 #include "emu_chip8.h"
-#include "tools.h"
 
 #define EMU_KEY_PRESSED 1
 #define EMU_KEY_RELEASED 0

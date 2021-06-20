@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+#define ENGINE_DEFAULT_CYCLES_PER_FRAME 30
+
 int engine_init(uint32_t cycles_per_frame);
 int engine_loop();
 

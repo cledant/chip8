@@ -9,7 +9,6 @@
 #include "tools.h"
 
 #define ENGINE_DRAW_RATE 60
-#define ENGINE_DEFAULT_CYCLES_PER_FRAME 8
 
 static int eg_should_close;
 static int eg_should_draw;

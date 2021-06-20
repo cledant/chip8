@@ -705,7 +705,7 @@ chip8_exec_draw(emu_inst_t inst, void *state, char const **err)
               (write_pos_w + EMU_CHIP8_W * write_pos_h) % 8;
 
             uint8_t sprite_bit =
-              (es->ram[rs->address_register + i] & (1 << (8 - j))) >> (8 - j);
+              (es->ram[rs->address_register + i] & (1 << (7 - j))) >> (7 - j);
             uint8_t fb_bit =
               (es->framebuffer[fb_bit_pos] & (1 << fb_bit_offset)) >>
               fb_bit_offset;

@@ -7,20 +7,25 @@
 #include "emulator.h"
 #include "engine.h"
 
+#define DEFAULT_SCALE 4
+
 typedef struct s_env
 {
     char const *rom_path;
     enum e_emu_rom_type rom_type;
+    long cycle_per_frame;
     long scale;
 } t_env;
 
 static void
 show_help()
 {
-    puts("./chip8_emu [-h | --help] ROM_FILEPATH ROM_TYPE [SCALE]");
+    puts("./chip8_emu [-h | --help] ROM_FILEPATH ROM_TYPE [CYCLE_PER_FRAME] "
+         "[SCALE]");
     puts("\tROM TYPE can be CHIP8, CHIP8_HI_RES, SUPERCHIP8");
     puts("\tSUPERCHIP8 supported version is 1.1");
-    puts("\tSCALE default is 4");
+    puts("\tCYCLE_PER_FRAME: Emulation speed. Default is 30");
+    puts("\tSCALE: Resolution scaling from original resolution. Default is 4");
 }
 
 static void
@@ -43,7 +48,7 @@ parse_args(t_env *env, int argc, char const **argv)
             return (1);
         }
     }
-    if (argc < 3 || argc > 5) {
+    if (argc < 3 || argc > 6) {
         show_help();
         return (1);
     }
@@ -53,10 +58,19 @@ parse_args(t_env *env, int argc, char const **argv)
         }
     }
     env->rom_path = argv[1];
-    if (argc == 4) {
+    if (argc >= 4) {
         char *end_ptr;
 
-        env->scale = strtol(argv[3], &end_ptr, 10);
+        env->cycle_per_frame = strtol(argv[3], &end_ptr, 10);
+        if (*end_ptr != '\0') {
+            puts("chip8_emu: CYCLE_PER_FRAME is not a number");
+            return (1);
+        }
+    }
+    if (argc == 5) {
+        char *end_ptr;
+
+        env->scale = strtol(argv[4], &end_ptr, 10);
         if (*end_ptr != '\0') {
             puts("chip8_emu: SCALE is not a number");
             return (1);
@@ -89,7 +103,9 @@ open_renderer(int32_t scale, char const **err)
 int
 main(int argc, char const **argv)
 {
-    t_env env = { NULL, EMU_RT_NONE, 4 };
+    t_env env = {
+        NULL, EMU_RT_NONE, ENGINE_DEFAULT_CYCLES_PER_FRAME, DEFAULT_SCALE
+    };
     if (parse_args(&env, argc, argv)) {
         return (1);
     }
@@ -117,7 +133,7 @@ main(int argc, char const **argv)
         shutdown(err);
         return (1);
     }
-    engine_init(20);
+    engine_init(env.cycle_per_frame);
     engine_loop();
     shutdown(NULL);
     return (0);
