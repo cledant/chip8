@@ -138,13 +138,6 @@ renderer_set_colors(int32_t background, int32_t sprite)
     rdr_colors_rgb[RDR_CT_SPRITE] = sprite;
 }
 
-void
-renderer_invert_background_color()
-{
-    rdr_colors_rgb[RDR_CT_BACKGROUND] =
-      ~(0xFFFFFF & rdr_colors_rgb[RDR_CT_BACKGROUND]);
-}
-
 int
 renderer_draw(void const *one_bit_depth_fb)
 {

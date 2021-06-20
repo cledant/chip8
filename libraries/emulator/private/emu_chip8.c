@@ -5,6 +5,7 @@
 #include <stdlib.h>
 
 #include "emu_state.h"
+#include "emu_fb.h"
 #include "tools.h"
 
 /*
@@ -684,6 +685,33 @@ chip8_exec_rnd(emu_inst_t inst, void *state, char const **err)
     return (0);
 }
 
+static int
+exec_draw_memory_location_checks(uint32_t ram_pos,
+                                 uint32_t fb_pos,
+                                 uint32_t max_ram_addr,
+                                 uint32_t max_fb)
+{
+    if (ram_pos > max_ram_addr) {
+        snprintf(chip8_err_buffer,
+                 CHIP8_ERROR_BUFFER_SIZE,
+                 "Instruction DXYN tried to load memory outside allowed "
+                 "range at 0x%x. Max allowed=Ox%x",
+                 ram_pos,
+                 max_ram_addr);
+        return (1);
+    }
+    if (fb_pos >= max_fb) {
+        snprintf(chip8_err_buffer,
+                 CHIP8_ERROR_BUFFER_SIZE,
+                 "Instruction DXYN tried to write framebuffer outside allowed "
+                 "range at 0x%x. Max allowed=Ox%x",
+                 fb_pos,
+                 max_fb);
+        return (1);
+    }
+    return (0);
+}
+
 int
 chip8_exec_draw(emu_inst_t inst, void *state, char const **err)
 {
@@ -697,13 +725,20 @@ chip8_exec_draw(emu_inst_t inst, void *state, char const **err)
     rs->general_registers[0xF] = 0;
     for (uint8_t i = 0; i < size_to_copy; ++i) {
         for (uint8_t j = 0; j < 8; ++j) {
-            int32_t write_pos_w = ((pos_w + j) % EMU_CHIP8_W);
-            int32_t write_pos_h = ((pos_h + i) % EMU_CHIP8_H);
+            uint32_t write_pos_w = ((pos_w + j) % EMU_CHIP8_W);
+            uint32_t write_pos_h = ((pos_h + i) % EMU_CHIP8_H);
 
-            int32_t fb_bit_pos = (write_pos_w + EMU_CHIP8_W * write_pos_h) / 8;
-            int32_t fb_bit_offset =
+            uint32_t fb_bit_pos = (write_pos_w + EMU_CHIP8_W * write_pos_h) / 8;
+            uint32_t fb_bit_offset =
               (write_pos_w + EMU_CHIP8_W * write_pos_h) % 8;
 
+            if (exec_draw_memory_location_checks(rs->address_register + i,
+                                                 fb_bit_pos,
+                                                 es->max_addr,
+                                                 es->max_fb)) {
+                *err = chip8_err_buffer;
+                return (1);
+            }
             uint8_t sprite_bit =
               (es->ram[rs->address_register + i] & (1 << (7 - j))) >> (7 - j);
             uint8_t fb_bit =
@@ -846,6 +881,16 @@ chip8_exec_ld_bcd_addr(emu_inst_t inst, void *state, char const **err)
     uint8_t divisor = 100;
     uint8_t count = 0;
     for (uint8_t i = 0; i < 3; ++i) {
+        if (rs->address_register + i > es->max_addr) {
+            snprintf(chip8_err_buffer,
+                     CHIP8_ERROR_BUFFER_SIZE,
+                     "Instruction FX33 tried to write memory outside allowed "
+                     "range at 0x%x. Max allowed=Ox%x",
+                     rs->address_register + i,
+                     es->max_addr);
+            *err = chip8_err_buffer;
+            return (1);
+        }
         es->ram[rs->address_register + i] =
           (rs->general_registers[inst.n2] - count) / divisor;
         count += es->ram[rs->address_register + i] * divisor;
@@ -862,8 +907,19 @@ chip8_exec_ld_store_register(emu_inst_t inst, void *state, char const **err)
     emu_registers_state_t *rs = &es->registers;
 
     for (uint8_t i = 0; i <= inst.n2; ++i) {
+        if (rs->address_register + i > es->max_addr) {
+            snprintf(chip8_err_buffer,
+                     CHIP8_ERROR_BUFFER_SIZE,
+                     "Instruction FX55 tried to write memory outside allowed "
+                     "range at 0x%x. Max allowed=Ox%x",
+                     rs->address_register + i,
+                     es->max_addr);
+            *err = chip8_err_buffer;
+            return (1);
+        }
         es->ram[rs->address_register + i] = rs->general_registers[i];
     }
+    rs->address_register += inst.n2 + 1;
     return (0);
 }
 
@@ -875,7 +931,18 @@ chip8_exec_ld_read_register(emu_inst_t inst, void *state, char const **err)
     emu_registers_state_t *rs = &es->registers;
 
     for (uint8_t i = 0; i <= inst.n2; ++i) {
+        if (rs->address_register + i > es->max_addr) {
+            snprintf(chip8_err_buffer,
+                     CHIP8_ERROR_BUFFER_SIZE,
+                     "Instruction FX65 tried to load memory outside allowed "
+                     "range at 0x%x. Max allowed=Ox%x",
+                     rs->address_register + i,
+                     es->max_addr);
+            *err = chip8_err_buffer;
+            return (1);
+        }
         rs->general_registers[i] = es->ram[rs->address_register + i];
     }
+    rs->address_register += inst.n2 + 1;
     return (0);
 }

@@ -19,7 +19,6 @@
  */
 static emu_rom_type_t emu_rom_type;
 static emu_state_t emu_state;
-static uint32_t emu_max_addr;
 static emu_parse_fct_t *emu_parse_fcts;
 static uint32_t emu_nb_inst;
 static emu_inst_t emu_curr_inst;
@@ -115,17 +114,20 @@ emu_load_rom(char const *rom_path, emu_rom_type_t rom_type, char const **err)
     emu_state.registers.program_counter = EMU_CHIP8_RAM_ENTRY_POINT;
     emu_rom_type = rom_type;
     if (rom_type == EMU_RT_CHIP_8) {
-        emu_max_addr = EMU_CHIP8_MAX_PROG_RAM_ADDR;
+        emu_state.max_addr = EMU_CHIP8_MAX_PROG_RAM_ADDR;
+        emu_state.max_fb = EMU_CHIP8_FRAMEBUFFER_SIZE;
         emu_nb_inst = EMU_CHIP8_NB_INST;
         emu_parse_fcts = g_chip8_parse_fcts;
     } else if (rom_type == EMU_RT_CHIP_8_HI_RES) {
-        emu_max_addr = EMU_CHIP8_MAX_PROG_RAM_ADDR;
+        emu_state.max_addr = EMU_CHIP8_MAX_PROG_RAM_ADDR;
+        emu_state.max_fb = EMU_CHIP8_FRAMEBUFFER_SIZE;
         emu_nb_inst = EMU_CHIP8_HI_RES_NB_INST;
         emu_parse_fcts = NULL;
         *err = "Chip8 Hi Res not implemented yet";
         return (1);
     } else if (rom_type == EMU_RT_SUPER_CHIP_8) {
-        emu_max_addr = EMU_SUPER_CHIP8_MAX_PROG_RAM_ADDR;
+        emu_state.max_addr = EMU_SUPER_CHIP8_MAX_PROG_RAM_ADDR;
+        emu_state.max_fb = EMU_SUPER_CHIP8_FRAMEBUFFER_SIZE;
         emu_nb_inst = EMU_SUPER_CHIP8_NB_INST;
         emu_parse_fcts = NULL;
         *err = "Super Chip8 not implemented yet";
@@ -203,13 +205,13 @@ emu_fetch(char const **err)
         printf("[WARN][FETCH]: PC (%x) not even aligned\n",
                emu_state.registers.program_counter);
     }
-    if (emu_state.registers.program_counter >= emu_max_addr) {
+    if (emu_state.registers.program_counter > emu_state.max_addr) {
         snprintf(
           emu_err_buffer,
           EMU_ERR_BUFFER_SIZE,
           "Program counter is outside allowed range=0x%x. Max allowed=0x%x",
           emu_state.registers.program_counter,
-          emu_max_addr);
+          emu_state.max_addr);
         *err = emu_err_buffer;
         emu_curr_inst = (emu_inst_t){ .n1 = 0, .n2 = 0, .n3 = 0, .n4 = 0 };
         return (1);
@@ -235,7 +237,11 @@ emu_decode(char const **err)
     }
     snprintf(emu_err_buffer,
              EMU_ERR_BUFFER_SIZE,
-             "Invalid OP code at PC = 0x%x",
+             "Invalid OP code (%d%d%d%d) at PC = 0x%x",
+             emu_curr_inst.n1,
+             emu_curr_inst.n2,
+             emu_curr_inst.n3,
+             emu_curr_inst.n4,
              emu_state.registers.program_counter - 2);
     *err = emu_err_buffer;
     return (1);
