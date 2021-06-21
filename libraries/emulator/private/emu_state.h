@@ -50,8 +50,6 @@ typedef struct s_emu_state
     int32_t keys_state[EMU_NB_KEYS];
     uint8_t framebuffer[EMU_FRAMEBUFFER_MAX_SIZE];
     uint8_t ram[EMU_RAM_SIZE];
-    double next_delay_timer;
-    double next_sound_timer;
     uint8_t skip_fetch;
 } emu_state_t;
 

@@ -1,6 +1,10 @@
 #ifndef CHIP8_EMU_EMU_CHIP8_H
 #define CHIP8_EMU_EMU_CHIP8_H
 
+/*
+ * This implementation will follow CHIP8 technical refrence from
+ * http://devernay.free.fr/hacks/chip8/C8TECH10.HTM
+ */
 #include "emu_inst.h"
 
 extern emu_parse_fct_t g_chip8_parse_fcts[EMU_CHIP8_NB_INST];
