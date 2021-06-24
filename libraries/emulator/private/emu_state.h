@@ -24,11 +24,6 @@
 #define EMU_NB_FONTS 16
 
 /*
- * Timers
- */
-#define EMU_DELAY_SOUND_RATE 60
-
-/*
  * Structs
  */
 typedef struct s_emu_registers_state

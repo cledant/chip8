@@ -11,7 +11,6 @@
 
 #include "emu_state.h"
 #include "emu_fb.h"
-#include "tools.h"
 
 /*
  * emu_chip8 variables

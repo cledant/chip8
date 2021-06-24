@@ -91,7 +91,7 @@ open_renderer(int32_t scale, char const **err)
         *err = "Unknown type of chip";
         return (1);
     }
-    if (renderer_create_window(fb_w * scale, fb_h * scale, err)) {
+    if (renderer_create_window(fb_w * scale, fb_h * scale, scale * 2, err)) {
         return (1);
     }
     if (renderer_create_framebuffer(fb_w, fb_h, err)) {
@@ -115,7 +115,7 @@ main(int argc, char const **argv)
                argv[2]);
         return (1);
     }
-    if (env.scale <= 0) {
+    if (env.scale < 1) {
         puts("chip8_emu: SCALE can't be 0 or inferior");
         return (1);
     }

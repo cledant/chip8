@@ -96,7 +96,7 @@ engine_loop()
         }
         if (eg_should_draw) {
             emu_decrement_timers();
-            renderer_draw(emu_fb);
+            renderer_draw(emu_fb, emu_is_sound_active());
             eg_should_draw = 0;
         }
     }

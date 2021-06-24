@@ -252,3 +252,9 @@ emu_get_framebuffer()
 {
     return (emu_state.framebuffer);
 }
+
+int
+emu_is_sound_active()
+{
+    return (emu_state.registers.sound_register);
+}
