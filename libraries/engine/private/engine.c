@@ -6,10 +6,14 @@
 #include "input.h"
 #include "event_buffer.h"
 #include "renderer.h"
+#include "audio.h"
 #include "tools.h"
 
 #define ENGINE_DRAW_RATE 60
 
+/*
+ * Engine variables
+ */
 static int eg_should_close;
 static int eg_should_draw;
 static int eg_should_cycle;
@@ -57,6 +61,9 @@ handle_timers()
     }
 }
 
+/*
+ * Public API
+ */
 int
 engine_init(uint32_t cycles_per_frame)
 {
@@ -96,7 +103,9 @@ engine_loop()
         }
         if (eg_should_draw) {
             emu_decrement_timers();
-            renderer_draw(emu_fb, emu_is_sound_active());
+            int is_sound_active = emu_is_sound_active();
+            (is_sound_active) ? audio_play_buzzer() : audio_stop_buzzer();
+            renderer_draw(emu_fb, is_sound_active);
             eg_should_draw = 0;
         }
     }

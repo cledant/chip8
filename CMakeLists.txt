@@ -55,6 +55,7 @@ add_subdirectory(libraries/engine)
 add_subdirectory(libraries/input)
 add_subdirectory(libraries/event)
 add_subdirectory(libraries/tools)
+add_subdirectory(libraries/audio)
 
 #Main binary
 add_executable(chip8_emu
@@ -62,8 +63,8 @@ add_executable(chip8_emu
 target_include_directories(chip8_emu
         PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/binary/private)
-target_link_libraries(chip8_emu emulator renderer engine input)
-add_dependencies(chip8_emu emulator renderer engine input)
+target_link_libraries(chip8_emu emulator renderer engine input audio)
+add_dependencies(chip8_emu emulator renderer engine input audio)
 set_target_properties(chip8_emu PROPERTIES
         C_STANDARD 11
         C_STANDARD_REQUIRED YES

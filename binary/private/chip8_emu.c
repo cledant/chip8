@@ -4,6 +4,7 @@
 
 #include "renderer.h"
 #include "input.h"
+#include "audio.h"
 #include "emulator.h"
 #include "engine.h"
 
@@ -36,6 +37,7 @@ shutdown(char const *msg)
     }
     renderer_destroy_window();
     input_destroy();
+    audio_destroy();
     renderer_destroy();
 }
 
@@ -130,6 +132,10 @@ main(int argc, char const **argv)
         return (1);
     }
     if (input_init(&err)) {
+        shutdown(err);
+        return (1);
+    }
+    if (audio_init(&err) || audio_set_buzzer_params(100, 1, &err)) {
         shutdown(err);
         return (1);
     }
