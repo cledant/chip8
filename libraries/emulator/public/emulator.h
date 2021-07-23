@@ -24,5 +24,6 @@ int emu_decode(char const **err);
 int emu_execute(char const **err);
 void const *emu_get_framebuffer();
 int emu_is_sound_active();
+int emu_should_exit();
 
 #endif // CHIP8_EMULATOR_H

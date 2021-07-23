@@ -113,7 +113,7 @@ main(int argc, char const **argv)
     }
     if (env.rom_type == EMU_RT_NONE) {
         printf("chip8_emu: Incorrect ROM type: %s\nROM TYPE can be CHIP8, "
-               "CHIP8_HI_RES, SUPERCHIP8\n",
+               "SUPERCHIP8\n",
                argv[2]);
         return (1);
     }

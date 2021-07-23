@@ -9,6 +9,7 @@
 #include "emu_state.h"
 #include "emu_inst.h"
 #include "emu_chip8.h"
+#include "emu_superchip8.h"
 
 #define EMU_KEY_PRESSED 1
 #define EMU_KEY_RELEASED 0
@@ -68,7 +69,7 @@ open_rom_file(char const *rom_path,
         return (1);
     }
     *rom_size = ftell(*rom_file);
-    if (*rom_size > EMU_CHIP8_MAX_ROM_SIZE || *rom_size < 0) {
+    if (*rom_size > EMU_MAX_ROM_SIZE || *rom_size < 0) {
         fclose(*rom_file);
         *err = "Rom file too big";
         return (1);
@@ -113,7 +114,7 @@ emu_load_rom(char const *rom_path, emu_rom_type_t rom_type, char const **err)
     emu_state.registers.program_counter = EMU_CHIP8_RAM_ENTRY_POINT;
     emu_rom_type = rom_type;
     if (rom_type == EMU_RT_CHIP_8) {
-        emu_state.max_addr = EMU_CHIP8_MAX_PROG_RAM_ADDR;
+        emu_state.max_addr = EMU_SUPER_CHIP8_MAX_PROG_RAM_ADDR;
         emu_state.max_fb = EMU_CHIP8_FRAMEBUFFER_SIZE;
         emu_nb_inst = EMU_CHIP8_NB_INST;
         emu_parse_fcts = g_chip8_parse_fcts;
@@ -121,9 +122,7 @@ emu_load_rom(char const *rom_path, emu_rom_type_t rom_type, char const **err)
         emu_state.max_addr = EMU_SUPER_CHIP8_MAX_PROG_RAM_ADDR;
         emu_state.max_fb = EMU_SUPER_CHIP8_FRAMEBUFFER_SIZE;
         emu_nb_inst = EMU_SUPER_CHIP8_NB_INST;
-        emu_parse_fcts = NULL;
-        *err = "Super Chip8 not implemented yet";
-        return (1);
+        emu_parse_fcts = g_superchip8_parse_fcts;
     } else {
         *err = "Loading invalid rom type";
         emu_rom_type = EMU_RT_NONE;
@@ -220,7 +219,7 @@ int
 emu_decode(char const **err)
 {
     for (uint32_t i = 0; i < emu_nb_inst; ++i) {
-        if ((emu_exec_fct = ((g_chip8_parse_fcts)[i])(emu_curr_inst))) {
+        if ((emu_exec_fct = ((emu_parse_fcts)[i])(emu_curr_inst))) {
             return (0);
         }
     }
@@ -257,4 +256,10 @@ int
 emu_is_sound_active()
 {
     return (emu_state.registers.sound_register);
+}
+
+int
+emu_should_exit()
+{
+    return (emu_state.should_exit);
 }

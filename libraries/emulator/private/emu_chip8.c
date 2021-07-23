@@ -1,7 +1,7 @@
 #include "emu_chip8.h"
 
 /*
- * This implementation will follow CHIP8 technical refrence from
+ * This implementation will follow CHIP8 technical reference from
  * http://devernay.free.fr/hacks/chip8/C8TECH10.HTM
  */
 
@@ -384,7 +384,7 @@ int
 chip8_exec_sys(emu_inst_t inst, void *state, char const **err)
 {
     /*
-     * Ignored instruction
+     * Opcode 0NNN : Ignored instruction
      */
     (void)inst;
     (void)state;
@@ -395,6 +395,9 @@ chip8_exec_sys(emu_inst_t inst, void *state, char const **err)
 int
 chip8_exec_cls(emu_inst_t inst, void *state, char const **err)
 {
+    /*
+     * Opcode 00E0
+     */
     (void)inst;
     (void)err;
     emu_state_t *es = state;
@@ -406,6 +409,9 @@ chip8_exec_cls(emu_inst_t inst, void *state, char const **err)
 int
 chip8_exec_ret(emu_inst_t inst, void *state, char const **err)
 {
+    /*
+     * Opcode 00EE
+     */
     (void)inst;
     emu_state_t *es = state;
     emu_registers_state_t *rs = &es->registers;
@@ -425,6 +431,9 @@ chip8_exec_ret(emu_inst_t inst, void *state, char const **err)
 int
 chip8_exec_jp_addr(emu_inst_t inst, void *state, char const **err)
 {
+    /*
+     * Opcode 1NNN
+     */
     (void)err;
     emu_state_t *es = state;
     emu_inst_addr_t inst_addr = emu_inst_to_emu_inst_addr(inst);
@@ -436,6 +445,9 @@ chip8_exec_jp_addr(emu_inst_t inst, void *state, char const **err)
 int
 chip8_exec_call(emu_inst_t inst, void *state, char const **err)
 {
+    /*
+     * Opcode 2NNN
+     */
     (void)err;
     (void)inst;
     emu_state_t *es = state;
@@ -450,6 +462,9 @@ chip8_exec_call(emu_inst_t inst, void *state, char const **err)
 int
 chip8_exec_se_register_byte(emu_inst_t inst, void *state, char const **err)
 {
+    /*
+     * Opcode 3XKK
+     */
     (void)err;
     emu_state_t *es = state;
     emu_registers_state_t *rs = &es->registers;
@@ -464,6 +479,9 @@ chip8_exec_se_register_byte(emu_inst_t inst, void *state, char const **err)
 int
 chip8_exec_sne_register_byte(emu_inst_t inst, void *state, char const **err)
 {
+    /*
+     * Opcode 4XKK
+     */
     (void)err;
     emu_state_t *es = state;
     emu_registers_state_t *rs = &es->registers;
@@ -478,6 +496,9 @@ chip8_exec_sne_register_byte(emu_inst_t inst, void *state, char const **err)
 int
 chip8_exec_se_register_register(emu_inst_t inst, void *state, char const **err)
 {
+    /*
+     * Opcode 5XY0
+     */
     (void)err;
     emu_state_t *es = state;
     emu_registers_state_t *rs = &es->registers;
@@ -492,6 +513,9 @@ chip8_exec_se_register_register(emu_inst_t inst, void *state, char const **err)
 int
 chip8_exec_ld_register_byte(emu_inst_t inst, void *state, char const **err)
 {
+    /*
+     * Opcode 6XKK
+     */
     (void)err;
     emu_state_t *es = state;
     emu_registers_state_t *rs = &es->registers;
@@ -504,6 +528,9 @@ chip8_exec_ld_register_byte(emu_inst_t inst, void *state, char const **err)
 int
 chip8_exec_add_register_byte(emu_inst_t inst, void *state, char const **err)
 {
+    /*
+     * Opcode 7XKK
+     */
     (void)err;
     emu_state_t *es = state;
     emu_registers_state_t *rs = &es->registers;
@@ -516,6 +543,9 @@ chip8_exec_add_register_byte(emu_inst_t inst, void *state, char const **err)
 int
 chip8_exec_ld_register_register(emu_inst_t inst, void *state, char const **err)
 {
+    /*
+     * Opcode 8XY0
+     */
     (void)err;
     emu_state_t *es = state;
     emu_registers_state_t *rs = &es->registers;
@@ -528,6 +558,9 @@ chip8_exec_ld_register_register(emu_inst_t inst, void *state, char const **err)
 int
 chip8_exec_or(emu_inst_t inst, void *state, char const **err)
 {
+    /*
+     * Opcode 8XY1
+     */
     (void)err;
     emu_state_t *es = state;
     emu_registers_state_t *rs = &es->registers;
@@ -540,6 +573,9 @@ chip8_exec_or(emu_inst_t inst, void *state, char const **err)
 int
 chip8_exec_and(emu_inst_t inst, void *state, char const **err)
 {
+    /*
+     * Opcode 8XY2
+     */
     (void)err;
     emu_state_t *es = state;
     emu_registers_state_t *rs = &es->registers;
@@ -552,6 +588,9 @@ chip8_exec_and(emu_inst_t inst, void *state, char const **err)
 int
 chip8_exec_xor(emu_inst_t inst, void *state, char const **err)
 {
+    /*
+     * Opcode 8XY3
+     */
     (void)err;
     emu_state_t *es = state;
     emu_registers_state_t *rs = &es->registers;
@@ -564,6 +603,9 @@ chip8_exec_xor(emu_inst_t inst, void *state, char const **err)
 int
 chip8_exec_add_register_register(emu_inst_t inst, void *state, char const **err)
 {
+    /*
+     * Opcode 8XY4
+     */
     (void)err;
     emu_state_t *es = state;
     emu_registers_state_t *rs = &es->registers;
@@ -580,6 +622,9 @@ chip8_exec_add_register_register(emu_inst_t inst, void *state, char const **err)
 int
 chip8_exec_sub(emu_inst_t inst, void *state, char const **err)
 {
+    /*
+     * Opcode 8XY5
+     */
     (void)err;
     emu_state_t *es = state;
     emu_registers_state_t *rs = &es->registers;
@@ -597,6 +642,9 @@ chip8_exec_sub(emu_inst_t inst, void *state, char const **err)
 int
 chip8_exec_shr(emu_inst_t inst, void *state, char const **err)
 {
+    /*
+     * Opcode 8XY6
+     */
     (void)err;
     emu_state_t *es = state;
     emu_registers_state_t *rs = &es->registers;
@@ -613,6 +661,9 @@ chip8_exec_shr(emu_inst_t inst, void *state, char const **err)
 int
 chip8_exec_subn(emu_inst_t inst, void *state, char const **err)
 {
+    /*
+     * Opcode 8XY7
+     */
     (void)err;
     emu_state_t *es = state;
     emu_registers_state_t *rs = &es->registers;
@@ -631,6 +682,9 @@ chip8_exec_subn(emu_inst_t inst, void *state, char const **err)
 int
 chip8_exec_shl(emu_inst_t inst, void *state, char const **err)
 {
+    /*
+     * Opcode 8XYE
+     */
     (void)err;
     emu_state_t *es = state;
     emu_registers_state_t *rs = &es->registers;
@@ -647,6 +701,9 @@ chip8_exec_shl(emu_inst_t inst, void *state, char const **err)
 int
 chip8_exec_sne_register_register(emu_inst_t inst, void *state, char const **err)
 {
+    /*
+     * Opcode 9XY0
+     */
     (void)err;
     emu_state_t *es = state;
     emu_registers_state_t *rs = &es->registers;
@@ -661,6 +718,9 @@ chip8_exec_sne_register_register(emu_inst_t inst, void *state, char const **err)
 int
 chip8_exec_ld_addr_register_addr(emu_inst_t inst, void *state, char const **err)
 {
+    /*
+     * Opcode ANNN
+     */
     (void)err;
     emu_state_t *es = state;
     emu_registers_state_t *rs = &es->registers;
@@ -673,6 +733,9 @@ chip8_exec_ld_addr_register_addr(emu_inst_t inst, void *state, char const **err)
 int
 chip8_exec_jp_v0_addr(emu_inst_t inst, void *state, char const **err)
 {
+    /*
+     * Opcode BNNN
+     */
     (void)err;
     emu_state_t *es = state;
     emu_registers_state_t *rs = &es->registers;
@@ -685,6 +748,9 @@ chip8_exec_jp_v0_addr(emu_inst_t inst, void *state, char const **err)
 int
 chip8_exec_rnd(emu_inst_t inst, void *state, char const **err)
 {
+    /*
+     * Opcode CXKK
+     */
     (void)err;
     emu_state_t *es = state;
     emu_registers_state_t *rs = &es->registers;
@@ -726,7 +792,9 @@ exec_draw_memory_location_checks(uint32_t ram_pos,
 int
 chip8_exec_draw(emu_inst_t inst, void *state, char const **err)
 {
-    (void)err;
+    /*
+     * Opcode DXYN
+     */
     emu_state_t *es = state;
     emu_registers_state_t *rs = &es->registers;
 
@@ -768,6 +836,9 @@ chip8_exec_draw(emu_inst_t inst, void *state, char const **err)
 int
 chip8_exec_skp(emu_inst_t inst, void *state, char const **err)
 {
+    /*
+     * Opcode EX9E
+     */
     (void)err;
     emu_state_t *es = state;
     emu_registers_state_t *rs = &es->registers;
@@ -786,6 +857,9 @@ chip8_exec_skp(emu_inst_t inst, void *state, char const **err)
 int
 chip8_exec_sknp(emu_inst_t inst, void *state, char const **err)
 {
+    /*
+     * Opcode EXA1
+     */
     (void)err;
     emu_state_t *es = state;
     emu_registers_state_t *rs = &es->registers;
@@ -803,6 +877,9 @@ chip8_exec_sknp(emu_inst_t inst, void *state, char const **err)
 int
 chip8_exec_ld_register_delay(emu_inst_t inst, void *state, char const **err)
 {
+    /*
+     * Opcode FX07
+     */
     (void)err;
     emu_state_t *es = state;
     emu_registers_state_t *rs = &es->registers;
@@ -815,6 +892,9 @@ chip8_exec_ld_register_delay(emu_inst_t inst, void *state, char const **err)
 int
 chip8_exec_ld_register_key(emu_inst_t inst, void *state, char const **err)
 {
+    /*
+     * Opcode FX0A
+     */
     (void)err;
     emu_state_t *es = state;
     emu_registers_state_t *rs = &es->registers;
@@ -833,6 +913,9 @@ chip8_exec_ld_register_key(emu_inst_t inst, void *state, char const **err)
 int
 chip8_exec_ld_delay_register(emu_inst_t inst, void *state, char const **err)
 {
+    /*
+     * Opcode FX15
+     */
     (void)err;
     emu_state_t *es = state;
     emu_registers_state_t *rs = &es->registers;
@@ -845,6 +928,9 @@ chip8_exec_ld_delay_register(emu_inst_t inst, void *state, char const **err)
 int
 chip8_exec_ld_sound_register(emu_inst_t inst, void *state, char const **err)
 {
+    /*
+     * Opcode FX18
+     */
     (void)err;
     emu_state_t *es = state;
     emu_registers_state_t *rs = &es->registers;
@@ -859,6 +945,9 @@ chip8_exec_add_addr_register_register(emu_inst_t inst,
                                       void *state,
                                       char const **err)
 {
+    /*
+     * Opcode FX1E
+     */
     (void)err;
     emu_state_t *es = state;
     emu_registers_state_t *rs = &es->registers;
@@ -873,6 +962,9 @@ chip8_exec_ld_font_addr_addr_register(emu_inst_t inst,
                                       void *state,
                                       char const **err)
 {
+    /*
+     * Opcode FX29
+     */
     (void)err;
     emu_state_t *es = state;
     emu_registers_state_t *rs = &es->registers;
@@ -886,6 +978,9 @@ chip8_exec_ld_font_addr_addr_register(emu_inst_t inst,
 int
 chip8_exec_ld_bcd_addr(emu_inst_t inst, void *state, char const **err)
 {
+    /*
+     * Opcode FX33
+     */
     (void)err;
     emu_state_t *es = state;
     emu_registers_state_t *rs = &es->registers;
@@ -914,6 +1009,9 @@ chip8_exec_ld_bcd_addr(emu_inst_t inst, void *state, char const **err)
 int
 chip8_exec_ld_store_register(emu_inst_t inst, void *state, char const **err)
 {
+    /*
+     * Opcode FX55
+     */
     (void)err;
     emu_state_t *es = state;
     emu_registers_state_t *rs = &es->registers;
@@ -937,6 +1035,9 @@ chip8_exec_ld_store_register(emu_inst_t inst, void *state, char const **err)
 int
 chip8_exec_ld_read_register(emu_inst_t inst, void *state, char const **err)
 {
+    /*
+     * Opcode FX65
+     */
     (void)err;
     emu_state_t *es = state;
     emu_registers_state_t *rs = &es->registers;

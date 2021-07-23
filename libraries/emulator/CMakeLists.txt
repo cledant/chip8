@@ -4,6 +4,7 @@ project(lib_emulator)
 add_library(emulator STATIC
         private/emulator.c
         private/emu_chip8.c
+        private/emu_superchip8.c
         private/emu_inst.c)
 target_include_directories(emulator
         PUBLIC

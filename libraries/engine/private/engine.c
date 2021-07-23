@@ -100,6 +100,9 @@ engine_loop()
                 err = NULL;
             }
             eg_should_cycle = 0;
+            if (emu_should_exit()) {
+                return (0);
+            }
         }
         if (eg_should_draw) {
             emu_decrement_timers();

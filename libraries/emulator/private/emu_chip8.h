@@ -2,7 +2,7 @@
 #define CHIP8_EMU_EMU_CHIP8_H
 
 /*
- * This implementation will follow CHIP8 technical refrence from
+ * This implementation will follow CHIP8 technical reference from
  * http://devernay.free.fr/hacks/chip8/C8TECH10.HTM
  */
 #include "emu_inst.h"
