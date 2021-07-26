@@ -59,7 +59,8 @@ add_subdirectory(libraries/audio)
 
 #Main binary
 add_executable(chip8_emu
-        ${CMAKE_CURRENT_SOURCE_DIR}/binary/private/chip8_emu.c)
+        ${CMAKE_CURRENT_SOURCE_DIR}/binary/private/chip8_emu.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/binary/private/args_parsing.c)
 target_include_directories(chip8_emu
         PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/binary/private)
