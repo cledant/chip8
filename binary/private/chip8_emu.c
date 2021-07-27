@@ -48,14 +48,13 @@ main(int argc, char const **argv)
                   EMU_RT_CHIP_8_MODERN,
                   ENGINE_DEFAULT_CYCLES_PER_FRAME,
                   DEFAULT_SCALE,
-                  0,
                   0 };
     if (parse_args(&env, argc, argv)) {
         return (1);
     }
 
     char const *err = NULL;
-    if (emu_load_rom(env.rom_path, env.rom_type, &err)) {
+    if (emu_load_rom(env.rom_path, env.rom_type, env.quirks, &err)) {
         shutdown(err);
         return (1);
     }

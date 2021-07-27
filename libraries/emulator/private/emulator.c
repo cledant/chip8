@@ -9,7 +9,9 @@
 #include "emu_state.h"
 #include "emu_inst.h"
 #include "emu_chip8.h"
+#include "emu_chip8_cosmac.h"
 #include "emu_superchip8.h"
+#include "emu_quirks.h"
 
 #define EMU_KEY_PRESSED 1
 #define EMU_KEY_RELEASED 0
@@ -87,10 +89,58 @@ open_rom_file(char const *rom_path,
  */
 char const *g_emu_rom_types_str[EMU_RT_NB_TYPES] = { "NONE",
                                                      "CHIP8",
-                                                     "SUPERCHIP8" };
+                                                     "SUPERCHIP8",
+                                                     "CHIP8_COSMAC" };
+
+static int
+setup_specific_rom_type(uint64_t quirks, char const **err)
+{
+    switch (emu_rom_type) {
+        case EMU_RT_CHIP_8_MODERN:
+            emu_state.max_addr = EMU_SUPER_CHIP8_MAX_PROG_RAM_ADDR;
+            emu_state.max_fb = EMU_CHIP8_FRAMEBUFFER_SIZE;
+            emu_nb_inst = EMU_CHIP8_NB_INST;
+            emu_parse_fcts = g_chip8_parse_fcts;
+            g_chip8_parse_fcts[EMU_CHIP8_DRAW_INST] =
+              (IS_QUIRK_DRAW_WRAP(quirks)) ? chip8_is_draw_wrap : chip8_is_draw;
+            g_chip8_parse_fcts[EMU_CHIP8_JP_VO_ADDR] =
+              (IS_QUIRK_BXNN_INST(quirks)) ? chip8_is_jp_v0_addr_quirk
+                                           : chip8_is_jp_v0_addr;
+            return (0);
+        case EMU_RT_SUPER_CHIP_8:
+            emu_state.max_addr = EMU_SUPER_CHIP8_MAX_PROG_RAM_ADDR;
+            emu_state.max_fb = EMU_SUPER_CHIP8_FRAMEBUFFER_SIZE;
+            emu_nb_inst = EMU_SUPER_CHIP8_NB_INST;
+            emu_parse_fcts = g_superchip8_parse_fcts;
+            g_superchip8_parse_fcts[EMU_CHIP8_JP_VO_ADDR] =
+              (IS_QUIRK_BXNN_INST(quirks)) ? chip8_is_jp_v0_addr_quirk
+                                           : chip8_is_jp_v0_addr;
+            // TODO : add draw inst
+            return (0);
+        case EMU_RT_CHIP_8_COSMAC:
+            emu_state.max_addr = EMU_CHIP8_COSMAC_MAX_PROG_RAM_ADDR;
+            emu_state.max_fb = EMU_CHIP8_FRAMEBUFFER_SIZE;
+            emu_nb_inst = EMU_CHIP8_NB_INST;
+            emu_parse_fcts = g_chip8_cosmac_parse_fcts;
+            g_chip8_cosmac_parse_fcts[EMU_CHIP8_DRAW_INST] =
+              (IS_QUIRK_DRAW_WRAP(quirks)) ? chip8_is_draw_wrap : chip8_is_draw;
+            g_chip8_cosmac_parse_fcts[EMU_CHIP8_JP_VO_ADDR] =
+              (IS_QUIRK_BXNN_INST(quirks)) ? chip8_is_jp_v0_addr_quirk
+                                           : chip8_is_jp_v0_addr;
+            return (0);
+        case EMU_RT_NONE:
+        default:
+            *err = "Loading invalid rom type";
+            emu_rom_type = EMU_RT_NONE;
+            return (1);
+    }
+}
 
 int
-emu_load_rom(char const *rom_path, emu_rom_type_t rom_type, char const **err)
+emu_load_rom(char const *rom_path,
+             emu_rom_type_t rom_type,
+             uint64_t quirks,
+             char const **err)
 {
     FILE *rom_file = NULL;
     long rom_size = 0;
@@ -113,19 +163,7 @@ emu_load_rom(char const *rom_path, emu_rom_type_t rom_type, char const **err)
 
     emu_state.registers.program_counter = EMU_CHIP8_RAM_ENTRY_POINT;
     emu_rom_type = rom_type;
-    if (rom_type == EMU_RT_CHIP_8_MODERN) {
-        emu_state.max_addr = EMU_SUPER_CHIP8_MAX_PROG_RAM_ADDR;
-        emu_state.max_fb = EMU_CHIP8_FRAMEBUFFER_SIZE;
-        emu_nb_inst = EMU_CHIP8_NB_INST;
-        emu_parse_fcts = g_chip8_parse_fcts;
-    } else if (rom_type == EMU_RT_SUPER_CHIP_8) {
-        emu_state.max_addr = EMU_SUPER_CHIP8_MAX_PROG_RAM_ADDR;
-        emu_state.max_fb = EMU_SUPER_CHIP8_FRAMEBUFFER_SIZE;
-        emu_nb_inst = EMU_SUPER_CHIP8_NB_INST;
-        emu_parse_fcts = g_superchip8_parse_fcts;
-    } else {
-        *err = "Loading invalid rom type";
-        emu_rom_type = EMU_RT_NONE;
+    if (setup_specific_rom_type(quirks, err)) {
         return (1);
     }
     srand48(time(NULL));

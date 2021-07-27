@@ -9,7 +9,7 @@
  * Ram Locations
  */
 #define EMU_CHIP8_RAM_ENTRY_POINT 0x200
-#define EMU_CHIP8_MAX_PROG_RAM_ADDR (0xE90 - 1)
+#define EMU_CHIP8_COSMAC_MAX_PROG_RAM_ADDR (0xE90 - 1)
 #define EMU_SUPER_CHIP8_MAX_PROG_RAM_ADDR (0xFFF - 1)
 
 /*

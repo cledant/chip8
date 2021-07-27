@@ -10,7 +10,7 @@ static void
 show_help()
 {
     puts("./chip8_emu [-h | --help][-t ROME_TYPE][-s SCALE][-c "
-         "CYCLE_PER_FRAME][-wB] ROM_FILEPATH");
+         "CYCLE_PER_FRAME][-w][-B] ROM_FILEPATH");
     puts("\t-t: Rom type can be CHIP8_COSMAC, CHIP8, SUPERCHIP8. Default is "
          "CHIP8.");
     puts("\t-c: Emulation speed. Default is 30.");
@@ -33,16 +33,12 @@ parse_help(t_env *env, int *cur_arg, int max_args, char const **argv)
 static int
 parse_emu_type(t_env *env, int *cur_arg, int max_args, char const **argv)
 {
-    static char const *types[] = {
-        "NONE", "CHIP8", "SUPERCHIP8", "CHIP8_COSMAC"
-    };
-
     if (*cur_arg + 1 >= max_args) {
         *cur_arg = max_args;
         return (1);
     }
     for (uint32_t i = 1; i < EMU_RT_NB_TYPES; ++i) {
-        if (!strcmp(types[i], argv[*cur_arg + 1])) {
+        if (!strcmp(g_emu_rom_types_str[i], argv[*cur_arg + 1])) {
             env->rom_type = i;
             ++*cur_arg;
             return (0);
@@ -93,8 +89,8 @@ parse_wrap(t_env *env, int *cur_arg, int max_args, char const **argv)
     (void)cur_arg;
     (void)max_args;
     (void)argv;
-    env->wrap = 1;
-    return (1);
+    env->quirks |= EMU_QUIRK_DRAW_WRAP;
+    return (0);
 }
 
 static int
@@ -104,8 +100,8 @@ parse_bxnn_inst(t_env *env, int *cur_arg, int max_args, char const **argv)
     (void)cur_arg;
     (void)max_args;
     (void)argv;
-    env->bxnn_inst = 1;
-    return (1);
+    env->quirks |= EMU_QUIRK_BXNN_INST;
+    return (0);
 }
 
 int

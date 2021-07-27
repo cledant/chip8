@@ -3,6 +3,9 @@
 
 #include <stdint.h>
 
+/*
+ * Types
+ */
 typedef enum e_emu_rom_type
 {
     EMU_RT_NONE = 0,
@@ -13,8 +16,17 @@ typedef enum e_emu_rom_type
 } emu_rom_type_t;
 extern char const *g_emu_rom_types_str[EMU_RT_NB_TYPES];
 
+/*
+ * Quirks
+ */
+#define EMU_QUIRK_BXNN_INST 1UL
+#define EMU_QUIRK_DRAW_WRAP (1UL << 1)
+#define IS_QUIRK_BXNN_INST(field) ((field) & EMU_QUIRK_BXNN_INST)
+#define IS_QUIRK_DRAW_WRAP(field) ((field) & EMU_QUIRK_DRAW_WRAP)
+
 int emu_load_rom(char const *rom_path,
                  emu_rom_type_t rom_type,
+                 uint64_t quirks,
                  char const **err);
 int emu_get_framebuffer_size(int32_t *w, int32_t *h);
 int emu_press_key(int32_t key_value);

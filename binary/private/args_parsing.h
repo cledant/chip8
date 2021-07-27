@@ -11,8 +11,7 @@ typedef struct s_env
     enum e_emu_rom_type rom_type;
     long cycle_per_frame;
     long scale;
-    int wrap;
-    int bxnn_inst;
+    uint64_t quirks;
 } t_env;
 
 int parse_args(t_env *env, int argc, char const **argv);
