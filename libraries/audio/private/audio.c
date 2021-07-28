@@ -52,7 +52,7 @@ generate_buzzer(char const **err)
     }
     for (uint32_t i = 0; i < (uint32_t)audio_sample_per_sine; ++i) {
         audio_buzzer_buffer[i] =
-          (sin(i / audio_sample_per_sine * M_PI * 2) + 1.0) * audio_amplitude;
+          (sin((i / audio_sample_per_sine) * M_PI * 2.0)) * audio_amplitude;
     }
     return (0);
 }
@@ -70,7 +70,7 @@ audio_init(char const **err)
     SDL_AudioSpec wanted = { .freq = DEFAULT_SAMPLE_RATE,
                              .format = AUDIO_F32,
                              .samples = DEFAULT_FRAME_PER_BUFFER,
-                             .channels = 2,
+                             .channels = 1,
                              .callback = audio_play_callback,
                              .userdata = NULL };
     SDL_AudioSpec get;

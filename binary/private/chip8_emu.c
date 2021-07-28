@@ -66,7 +66,7 @@ main(int argc, char const **argv)
         shutdown(err);
         return (1);
     }
-    if (audio_init(&err) || audio_set_buzzer_params(100, 1, &err)) {
+    if (audio_init(&err) || audio_set_buzzer_params(2000, 1, &err)) {
         shutdown(err);
         return (1);
     }
