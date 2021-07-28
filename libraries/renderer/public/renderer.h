@@ -11,10 +11,10 @@ int renderer_create_window(int32_t w,
                            char const **err);
 void renderer_destroy_window();
 int renderer_create_framebuffer(int32_t fb_w, int32_t fb_h, char const **err);
-void renderer_set_colors(int32_t background,
-                         int32_t sprite,
-                         int32_t silent,
-                         int32_t sound);
+void renderer_set_colors(uint32_t background,
+                         uint32_t sprite,
+                         uint32_t silent,
+                         uint32_t sound);
 int renderer_draw(void const *one_bit_depth_fb, int is_sound_active);
 
 #endif // CHIP8_EMU_RENDERER_H

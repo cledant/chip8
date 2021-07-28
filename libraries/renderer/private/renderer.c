@@ -30,7 +30,7 @@ typedef enum e_color_type
  * Renderer variables
  */
 static renderer_t rdr_env;
-static int32_t rdr_emu_colors_rgb[RDR_CT_NB_COLOR] = { 0x222222,
+static uint32_t rdr_emu_colors_rgb[RDR_CT_NB_COLOR] = { 0x222222,
                                                        0x00BB00,
                                                        0x000000,
                                                        0x555555 };
@@ -146,10 +146,10 @@ renderer_create_framebuffer(int32_t fb_w, int32_t fb_h, char const **err)
 }
 
 void
-renderer_set_colors(int32_t background,
-                    int32_t sprite,
-                    int32_t silent,
-                    int32_t sound)
+renderer_set_colors(uint32_t background,
+                    uint32_t sprite,
+                    uint32_t silent,
+                    uint32_t sound)
 {
     rdr_emu_colors_rgb[RDR_CT_BACKGROUND] = background;
     rdr_emu_colors_rgb[RDR_CT_SPRITE] = sprite;
@@ -160,7 +160,7 @@ renderer_set_colors(int32_t background,
 int
 renderer_draw(void const *one_bit_depth_fb, int is_sound_active)
 {
-    int win_background_color;
+    uint32_t win_background_color;
     if (!is_sound_active) {
         win_background_color = rdr_emu_colors_rgb[RDR_CT_SILENT];
     } else {

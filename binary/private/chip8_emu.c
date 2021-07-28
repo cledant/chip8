@@ -21,7 +21,12 @@ shutdown(char const *msg)
 }
 
 static int
-open_renderer(int32_t scale, char const **err)
+open_renderer(uint32_t scale,
+              uint32_t background_color,
+              uint32_t sprite_color,
+              uint32_t silent_color,
+              uint32_t buzzer_color,
+              char const **err)
 {
     if (renderer_init(err)) {
         return (1);
@@ -38,6 +43,8 @@ open_renderer(int32_t scale, char const **err)
     if (renderer_create_framebuffer(fb_w, fb_h, err)) {
         return (1);
     }
+    renderer_set_colors(
+      background_color, sprite_color, silent_color, buzzer_color);
     return (0);
 }
 
@@ -46,9 +53,14 @@ main(int argc, char const **argv)
 {
     t_env env = { NULL,
                   EMU_RT_CHIP_8_MODERN,
-                  ENGINE_DEFAULT_CYCLES_PER_FRAME,
-                  DEFAULT_SCALE,
-                  0 };
+                  ARGS_DEFAULT_CYCLES_PER_FRAME,
+                  ARGS_DEFAULT_SCALE,
+                  0,
+                  ARGS_DEFAULT_BACKGROUND_COLOR,
+                  ARGS_DEFAULT_SPRITE_COLOR,
+                  ARGS_DEFAULT_SILENT_COLOR,
+                  ARGS_DEFAULT_BUZZER_COLOR,
+                  ARGS_DEFAULT_BUZZER_TONE };
     if (parse_args(&env, argc, argv)) {
         return (1);
     }
@@ -58,7 +70,12 @@ main(int argc, char const **argv)
         shutdown(err);
         return (1);
     }
-    if (open_renderer(env.scale, &err)) {
+    if (open_renderer(env.scale,
+                      env.background_color,
+                      env.sprite_color,
+                      env.silent_color,
+                      env.buzzer_color,
+                      &err)) {
         shutdown(err);
         return (1);
     }
@@ -66,7 +83,7 @@ main(int argc, char const **argv)
         shutdown(err);
         return (1);
     }
-    if (audio_init(&err) || audio_set_buzzer_params(2000, 1, &err)) {
+    if (audio_init(&err) || audio_set_buzzer_params(env.buzzer_tone, 1, &err)) {
         shutdown(err);
         return (1);
     }
