@@ -804,6 +804,10 @@ chip8_exec_draw(emu_inst_t inst, void *state, char const **err)
     rs->general_registers[0xF] = 0;
     for (uint8_t i = 0; i < size_to_copy; ++i) {
         for (uint8_t j = 0; j < 8; ++j) {
+            if ((((pos_w + j) / EMU_CHIP8_W) != ((pos_w / EMU_CHIP8_W))) ||
+                (((pos_h + i) / EMU_CHIP8_H) != ((pos_h / EMU_CHIP8_H)))) {
+                continue;
+            }
             uint32_t write_pos_w = ((pos_w + j) % EMU_CHIP8_W);
             uint32_t write_pos_h = ((pos_h + i) % EMU_CHIP8_H);
 
