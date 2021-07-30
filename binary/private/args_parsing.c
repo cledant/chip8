@@ -16,10 +16,12 @@ typedef int (*args_parse_t)(void *,
 static void
 show_help()
 {
-    puts("./chip8_emu [-h | --help]"
+    puts("./chip8_emu"
          "[-b BACKGROUND_COLOR]"
          "[-c CYCLE_PER_FRAME]"
+         "[-h | --help]"
          "[-i SILENT_COLOR]"
+         "[-k | --keys]"
          "[-m]"
          "[-p SPRITE_COLOR]"
          "[-s SCALE]"
@@ -30,8 +32,10 @@ show_help()
     printf("\t-b: Background RGB color in hex format. Default is 0x%6x\n",
            ARGS_DEFAULT_BACKGROUND_COLOR);
     puts("\t-c: Cycles per frames (Emulation speed). Default is 30.");
+    puts("\t-h | --help: Display help.");
     printf("\t-i: Silent RGB color in hex format. Default is 0x%06x\n",
            ARGS_DEFAULT_SILENT_COLOR);
+    puts("\t-k | --keys: Display key mapping.");
     puts("\t-m: Mute buzzer sound.");
     printf("\t-p: Sprite RGB color in hex format. Default is 0x%06x\n",
            ARGS_DEFAULT_SPRITE_COLOR);
@@ -42,9 +46,21 @@ show_help()
            ARGS_DEFAULT_BUZZER_TONE);
     printf("\t-z: Buzzer RGB color in hex format. Default is 0x%6x\n",
            ARGS_DEFAULT_BUZZER_COLOR);
-    puts("\t-A: Warns when instruction are not even aligned.");
+    puts("\t-A: Warn when instruction are not even aligned.");
     puts("\t-B: Activate SUPERCHIP8 quirk on BNNN instrution.");
     puts("\t-W: Change sprite drawing behaviour from clipping to wrapping.");
+}
+
+static void
+show_keys()
+{
+    puts(
+      "Key mapping is based on QWERTY US keyboard and is not locale dependent");
+    puts("CHIP8 keys | Emulator keys");
+    puts("1 2 3 C    | 1 2 3 4");
+    puts("4 5 6 D    | Q W E R");
+    puts("7 8 9 E    | A S D F");
+    puts("A 0 B F    | Z X C V");
 }
 
 static int
@@ -62,6 +78,24 @@ parse_help(void *var,
     (void)err_msg;
     (void)other;
     show_help();
+    return (1);
+}
+
+static int
+parse_keys(void *var,
+           int *cur_arg,
+           int max_args,
+           char const **argv,
+           char const *err_msg,
+           uint64_t const *other)
+{
+    (void)var;
+    (void)cur_arg;
+    (void)max_args;
+    (void)argv;
+    (void)err_msg;
+    (void)other;
+    show_keys();
     return (1);
 }
 
@@ -231,14 +265,14 @@ parse_args(t_env *env, int argc, char const **argv)
     /*
      * Parsing related arrays
      */
-    static char const *options[] = { "-h", "--help", "-t", "-c", "-s",
-                                     "-W", "-B",     "-u", "-b", "-p",
-                                     "-i", "-z",     "-A", "-m" };
+    static char const *options[] = { "-h", "--help", "-t", "-c",    "-s", "-W",
+                                     "-B", "-u",     "-b", "-p",    "-i", "-z",
+                                     "-A", "-m",     "-k", "--keys" };
     static args_parse_t const fct_ptr[] = {
         parse_help,      parse_help,      parse_emu_type,  parse_long,
         parse_long,      parse_bit_field, parse_bit_field, parse_double,
         parse_long,      parse_long,      parse_long,      parse_long,
-        parse_bit_field, parse_bit_field
+        parse_bit_field, parse_bit_field, parse_keys,      parse_keys
     };
 
     /*
@@ -257,7 +291,9 @@ parse_args(t_env *env, int argc, char const **argv)
                      &env->silent_color,
                      &env->buzzer_color,
                      &env->emu_options,
-                     &env->engine_options };
+                     &env->engine_options,
+                     NULL,
+                     NULL };
     static char const *err_msg[] = {
         NULL,
         NULL,
@@ -272,12 +308,26 @@ parse_args(t_env *env, int argc, char const **argv)
         "chip8_emu: SILENT_COLOR is not a number",
         "chip8_emu: BUZZER_COLOR is not a number",
         NULL,
+        NULL,
+        NULL,
         NULL
     };
-    static uint64_t const others[] = {
-        0, 0,  0,  10, 10, EMU_QUIRK_DRAW_WRAP,         EMU_QUIRK_BXNN_INST,
-        0, 16, 16, 16, 16, EMU_OPTION_WARN_NOT_ALIGNED, ENGINE_OPTION_MUTE_SOUND
-    };
+    static uint64_t const others[] = { 0,
+                                       0,
+                                       0,
+                                       10,
+                                       10,
+                                       EMU_QUIRK_DRAW_WRAP,
+                                       EMU_QUIRK_BXNN_INST,
+                                       0,
+                                       16,
+                                       16,
+                                       16,
+                                       16,
+                                       EMU_OPTION_WARN_NOT_ALIGNED,
+                                       ENGINE_OPTION_MUTE_SOUND,
+                                       0,
+                                       0 };
 
     if (argc == 1) {
         show_help();
