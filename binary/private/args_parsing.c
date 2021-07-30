@@ -36,8 +36,8 @@ show_help()
     printf("\t-p: Sprite RGB color in hex format. Default is 0x%06x\n",
            ARGS_DEFAULT_SPRITE_COLOR);
     puts("\t-s: Resolution scaling from original resolution. Default is 8.");
-    puts("\t-t: Rom Type can be CHIP8_COSMAC, CHIP8, SUPERCHIP8. Default is "
-         "CHIP8.");
+    puts("\t-t: Rom Type can be CHIP8_COSMAC_VIP, CHIP8, SUPERCHIP8. Default "
+         "is CHIP8.");
     printf("\t-u: Buzzer tone in Hz. Default is %g Hz\n",
            ARGS_DEFAULT_BUZZER_TONE);
     printf("\t-z: Buzzer RGB color in hex format. Default is 0x%6x\n",
@@ -189,7 +189,7 @@ error_checks(t_env const *env, char const **argv)
 {
     if (env->rom_type == EMU_RT_NONE || env->rom_type >= EMU_RT_NB_TYPES) {
         printf("chip8_emu: Incorrect ROM type: %s\nROM TYPE can be "
-               "CHIP8_COSMAC, CHIP8, SUPERCHIP8\n",
+               "CHIP8_COSMAC_VIP, CHIP8, SUPERCHIP8\n",
                argv[2]);
         return (1);
     }

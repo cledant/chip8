@@ -11,7 +11,7 @@ typedef enum e_emu_rom_type
     EMU_RT_NONE = 0,
     EMU_RT_CHIP_8_MODERN,
     EMU_RT_SUPER_CHIP_8,
-    EMU_RT_CHIP_8_COSMAC,
+    EMU_RT_CHIP_8_COSMAC_VIP,
     EMU_RT_NB_TYPES,
 } emu_rom_type_t;
 extern char const *g_emu_rom_types_str[EMU_RT_NB_TYPES];

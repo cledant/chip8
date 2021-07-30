@@ -9,7 +9,7 @@
 #include "emu_state.h"
 #include "emu_inst.h"
 #include "emu_chip8.h"
-#include "emu_chip8_cosmac.h"
+#include "emu_chip8_cosmac_vip.h"
 #include "emu_superchip8.h"
 #include "emu_quirks.h"
 
@@ -91,7 +91,7 @@ open_rom_file(char const *rom_path,
 char const *g_emu_rom_types_str[EMU_RT_NB_TYPES] = { "NONE",
                                                      "CHIP8",
                                                      "SUPERCHIP8",
-                                                     "CHIP8_COSMAC" };
+                                                     "CHIP8_COSMAC_VIP" };
 
 static int
 setup_specific_rom_type(uint64_t quirks, char const **err)
@@ -118,14 +118,14 @@ setup_specific_rom_type(uint64_t quirks, char const **err)
                                            : chip8_is_jp_v0_addr;
             // TODO : add draw inst
             return (0);
-        case EMU_RT_CHIP_8_COSMAC:
+        case EMU_RT_CHIP_8_COSMAC_VIP:
             emu_state.max_addr = EMU_CHIP8_COSMAC_MAX_PROG_RAM_ADDR;
             emu_state.max_fb = EMU_CHIP8_FRAMEBUFFER_SIZE;
             emu_nb_inst = EMU_CHIP8_NB_INST;
-            emu_parse_fcts = g_chip8_cosmac_parse_fcts;
-            g_chip8_cosmac_parse_fcts[EMU_CHIP8_DRAW_INST] =
+            emu_parse_fcts = g_chip8_cosmac_vip_parse_fcts;
+            g_chip8_cosmac_vip_parse_fcts[EMU_CHIP8_DRAW_INST] =
               (IS_EMU_QUIRK_DRAW_WRAP(quirks)) ? chip8_is_draw_wrap : chip8_is_draw;
-            g_chip8_cosmac_parse_fcts[EMU_CHIP8_JP_VO_ADDR] =
+            g_chip8_cosmac_vip_parse_fcts[EMU_CHIP8_JP_VO_ADDR] =
               (IS_EMU_QUIRK_BXNN_INST(quirks)) ? chip8_is_jp_v0_addr_quirk
                                            : chip8_is_jp_v0_addr;
             return (0);
@@ -177,7 +177,7 @@ int
 emu_get_framebuffer_size(int32_t *w, int32_t *h)
 {
     if (emu_rom_type == EMU_RT_CHIP_8_MODERN ||
-        emu_rom_type == EMU_RT_CHIP_8_COSMAC) {
+        emu_rom_type == EMU_RT_CHIP_8_COSMAC_VIP) {
         *w = EMU_CHIP8_W;
         *h = EMU_CHIP8_H;
     } else if (emu_rom_type == EMU_RT_SUPER_CHIP_8) {

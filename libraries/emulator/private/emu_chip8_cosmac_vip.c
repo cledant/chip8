@@ -1,5 +1,5 @@
 #include "emu_chip8.h"
-#include "emu_chip8_cosmac.h"
+#include "emu_chip8_cosmac_vip.h"
 
 /*
  * This implementation will follow CHIP8 technical reference from
@@ -14,7 +14,7 @@
 /*
  * emu_chip8 variables
  */
-emu_parse_fct_t g_chip8_cosmac_parse_fcts[EMU_CHIP8_NB_INST] = {
+emu_parse_fct_t g_chip8_cosmac_vip_parse_fcts[EMU_CHIP8_NB_INST] = {
     chip8_is_cls,
     chip8_is_ret,
     chip8_is_sys,
@@ -31,9 +31,9 @@ emu_parse_fct_t g_chip8_cosmac_parse_fcts[EMU_CHIP8_NB_INST] = {
     chip8_is_xor,
     chip8_is_add_register_register,
     chip8_is_sub,
-    chip8_cosmac_is_shr,
+    chip8_cosmac_vip_is_shr,
     chip8_is_subn,
-    chip8_cosmac_is_shl,
+    chip8_cosmac_vip_is_shl,
     chip8_is_sne_register_register,
     chip8_is_ld_addr_register_addr,
     chip8_is_jp_v0_addr,
@@ -48,8 +48,8 @@ emu_parse_fct_t g_chip8_cosmac_parse_fcts[EMU_CHIP8_NB_INST] = {
     chip8_is_add_addr_register_register,
     chip8_is_ld_font_addr_addr_register,
     chip8_is_ld_bcd_addr,
-    chip8_cosmac_is_ld_store_register,
-    chip8_cosmac_is_ld_read_register
+    chip8_cosmac_vip_is_ld_store_register,
+    chip8_cosmac_vip_is_ld_read_register
 };
 
 /*
@@ -62,37 +62,37 @@ static char chip8_cosmac_err_buffer[CHIP8_COSMAC_ERROR_BUFFER_SIZE];
  * Chip8 Cosmac Inst Detection fct
  */
 emu_exec_fct_t
-chip8_cosmac_is_shr(emu_inst_t inst)
+chip8_cosmac_vip_is_shr(emu_inst_t inst)
 {
     if (inst.n1 == 0x8 && inst.n4 == 0x6) {
-        return (chip8_cosmac_exec_shr);
+        return (chip8_cosmac_vip_exec_shr);
     }
     return (NULL);
 }
 
 emu_exec_fct_t
-chip8_cosmac_is_shl(emu_inst_t inst)
+chip8_cosmac_vip_is_shl(emu_inst_t inst)
 {
     if (inst.n1 == 0x8 && inst.n4 == 0xE) {
-        return (chip8_cosmac_exec_shl);
+        return (chip8_cosmac_vip_exec_shl);
     }
     return (NULL);
 }
 
 emu_exec_fct_t
-chip8_cosmac_is_ld_store_register(emu_inst_t inst)
+chip8_cosmac_vip_is_ld_store_register(emu_inst_t inst)
 {
     if (inst.n1 == 0xF && inst.n3 == 0x5 && inst.n4 == 0x5) {
-        return (chip8_cosmac_exec_ld_store_register);
+        return (chip8_cosmac_vip_exec_ld_store_register);
     }
     return (NULL);
 }
 
 emu_exec_fct_t
-chip8_cosmac_is_ld_read_register(emu_inst_t inst)
+chip8_cosmac_vip_is_ld_read_register(emu_inst_t inst)
 {
     if (inst.n1 == 0xF && inst.n3 == 0x6 && inst.n4 == 0x5) {
-        return (chip8_cosmac_exec_ld_read_register);
+        return (chip8_cosmac_vip_exec_ld_read_register);
     }
     return (NULL);
 }
@@ -101,7 +101,7 @@ chip8_cosmac_is_ld_read_register(emu_inst_t inst)
  * Chip8 Cosmac Inst Exec fct
  */
 int
-chip8_cosmac_exec_shr(emu_inst_t inst, void *state, char const **err)
+chip8_cosmac_vip_exec_shr(emu_inst_t inst, void *state, char const **err)
 {
     /*
      * Opcode 8XY6
@@ -119,7 +119,7 @@ chip8_cosmac_exec_shr(emu_inst_t inst, void *state, char const **err)
 }
 
 int
-chip8_cosmac_exec_shl(emu_inst_t inst, void *state, char const **err)
+chip8_cosmac_vip_exec_shl(emu_inst_t inst, void *state, char const **err)
 {
     /*
      * Opcode 8XYE
@@ -137,9 +137,9 @@ chip8_cosmac_exec_shl(emu_inst_t inst, void *state, char const **err)
 }
 
 int
-chip8_cosmac_exec_ld_store_register(emu_inst_t inst,
-                                    void *state,
-                                    char const **err)
+chip8_cosmac_vip_exec_ld_store_register(emu_inst_t inst,
+                                        void *state,
+                                        char const **err)
 {
     /*
      * Opcode FX55
@@ -166,9 +166,9 @@ chip8_cosmac_exec_ld_store_register(emu_inst_t inst,
 }
 
 int
-chip8_cosmac_exec_ld_read_register(emu_inst_t inst,
-                                   void *state,
-                                   char const **err)
+chip8_cosmac_vip_exec_ld_read_register(emu_inst_t inst,
+                                       void *state,
+                                       char const **err)
 {
     /*
      * Opcode FX65
