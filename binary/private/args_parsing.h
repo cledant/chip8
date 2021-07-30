@@ -18,6 +18,7 @@ typedef struct s_env
     long cycle_per_frame;
     long scale;
     uint64_t quirks;
+    uint64_t options;
     long background_color;
     long sprite_color;
     long silent_color;

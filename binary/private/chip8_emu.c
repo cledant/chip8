@@ -56,6 +56,7 @@ main(int argc, char const **argv)
                   ARGS_DEFAULT_CYCLES_PER_FRAME,
                   ARGS_DEFAULT_SCALE,
                   0,
+                  0,
                   ARGS_DEFAULT_BACKGROUND_COLOR,
                   ARGS_DEFAULT_SPRITE_COLOR,
                   ARGS_DEFAULT_SILENT_COLOR,
@@ -66,7 +67,8 @@ main(int argc, char const **argv)
     }
 
     char const *err = NULL;
-    if (emu_load_rom(env.rom_path, env.rom_type, env.quirks, &err)) {
+    if (emu_load_rom(
+          env.rom_path, env.rom_type, env.quirks, env.options, &err)) {
         shutdown(err);
         return (1);
     }

@@ -21,12 +21,19 @@ extern char const *g_emu_rom_types_str[EMU_RT_NB_TYPES];
  */
 #define EMU_QUIRK_BXNN_INST 1UL
 #define EMU_QUIRK_DRAW_WRAP (1UL << 1)
-#define IS_QUIRK_BXNN_INST(field) ((field) & EMU_QUIRK_BXNN_INST)
-#define IS_QUIRK_DRAW_WRAP(field) ((field) & EMU_QUIRK_DRAW_WRAP)
+#define IS_QUIRK_BXNN_INST(field) ((field)&EMU_QUIRK_BXNN_INST)
+#define IS_QUIRK_DRAW_WRAP(field) ((field)&EMU_QUIRK_DRAW_WRAP)
+
+/*
+ * Options
+ */
+#define EMU_OPTION_WARN_NOT_ALIGNED 1UL
+#define IS_OPTION_WARN_NOT_ALIGNED(field) ((field)&EMU_OPTION_WARN_NOT_ALIGNED)
 
 int emu_load_rom(char const *rom_path,
                  emu_rom_type_t rom_type,
                  uint64_t quirks,
+                 uint64_t options,
                  char const **err);
 int emu_get_framebuffer_size(int32_t *w, int32_t *h);
 int emu_press_key(int32_t key_value);

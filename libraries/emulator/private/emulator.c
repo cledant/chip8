@@ -24,6 +24,7 @@ static emu_rom_type_t emu_rom_type;
 static emu_state_t emu_state;
 static emu_parse_fct_t *emu_parse_fcts;
 static uint32_t emu_nb_inst;
+static uint64_t emu_options;
 static emu_inst_t emu_curr_inst;
 static emu_exec_fct_t emu_exec_fct;
 static char emu_err_buffer[EMU_ERR_BUFFER_SIZE];
@@ -140,6 +141,7 @@ int
 emu_load_rom(char const *rom_path,
              emu_rom_type_t rom_type,
              uint64_t quirks,
+             uint64_t options,
              char const **err)
 {
     FILE *rom_file = NULL;
@@ -167,6 +169,7 @@ emu_load_rom(char const *rom_path,
         return (1);
     }
     srand48(time(NULL));
+    emu_options = options;
     return (0);
 }
 
@@ -228,7 +231,8 @@ emu_fetch(char const **err)
     if (emu_state.skip_fetch) {
         return (0);
     }
-    if (emu_state.registers.program_counter % 2) {
+    if (emu_state.registers.program_counter % 2 &&
+        IS_OPTION_WARN_NOT_ALIGNED(emu_options)) {
         printf("[WARN][FETCH]: PC (%x) not even aligned\n",
                emu_state.registers.program_counter);
     }

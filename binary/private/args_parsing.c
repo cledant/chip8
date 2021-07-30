@@ -25,7 +25,7 @@ show_help()
          "[-t ROME_TYPE]"
          "[-u BUZZER_TONE]"
          "[-z BUZZER_ACTIVE_COLOR]"
-         "[-B][-W] ROM_FILEPATH");
+         "[-A][-B][-W] ROM_FILEPATH");
     printf("\t-b: Background RGB color in hex format. Default is 0x%6x\n",
            ARGS_DEFAULT_BACKGROUND_COLOR);
     puts("\t-c: Cycles per frames (Emulation speed). Default is 30.");
@@ -40,6 +40,7 @@ show_help()
            ARGS_DEFAULT_BUZZER_TONE);
     printf("\t-z: Buzzer RGB color in hex format. Default is 0x%6x\n",
            ARGS_DEFAULT_BUZZER_COLOR);
+    puts("\t-A: Warns when instruction are not even aligned.");
     puts("\t-B: Activate SUPERCHIP8 quirk on BNNN instrution.");
     puts("\t-W: Change sprite drawing behaviour from clipping to wrapping.");
 }
@@ -228,12 +229,14 @@ parse_args(t_env *env, int argc, char const **argv)
     /*
      * Parsing related arrays
      */
-    static char const *options[] = { "-h", "--help", "-t", "-c", "-s", "-W",
-                                     "-B", "-u",     "-b", "-p", "-i", "-z" };
+    static char const *options[] = { "-h", "--help", "-t", "-c", "-s",
+                                     "-W", "-B",     "-u", "-b", "-p",
+                                     "-i", "-z",     "-A" };
     static args_parse_t const fct_ptr[] = {
-        parse_help, parse_help,      parse_emu_type,  parse_long,
-        parse_long, parse_bit_field, parse_bit_field, parse_double,
-        parse_long, parse_long,      parse_long,      parse_long
+        parse_help,     parse_help,      parse_emu_type,  parse_long,
+        parse_long,     parse_bit_field, parse_bit_field, parse_double,
+        parse_long,     parse_long,      parse_long,      parse_long,
+        parse_bit_field
     };
 
     /*
@@ -252,6 +255,7 @@ parse_args(t_env *env, int argc, char const **argv)
         &env->sprite_color,
         &env->silent_color,
         &env->buzzer_color,
+        &env->options,
     };
     static char const *err_msg[] = {
         NULL,
@@ -266,10 +270,11 @@ parse_args(t_env *env, int argc, char const **argv)
         "chip8_emu: SPRITE_COLOR is not a number",
         "chip8_emu: SILENT_COLOR is not a number",
         "chip8_emu: BUZZER_COLOR is not a number",
+        NULL
     };
     static uint64_t const others[] = {
-        0, 0,  0,  10, 10, EMU_QUIRK_DRAW_WRAP, EMU_QUIRK_BXNN_INST,
-        0, 16, 16, 16, 16,
+        0, 0,  0,  10, 10, EMU_QUIRK_DRAW_WRAP,        EMU_QUIRK_BXNN_INST,
+        0, 16, 16, 16, 16, EMU_OPTION_WARN_NOT_ALIGNED
     };
 
     if (argc == 1) {
