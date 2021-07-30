@@ -7,6 +7,7 @@
 #define DEFAULT_SAMPLE_RATE 48000
 #define DEFAULT_FRAME_PER_BUFFER 2048
 #define DEFAULT_AMPLITUDE 1
+#define DEFAULT_NB_CHANNEL 2
 
 /*
  * Audio device variables
@@ -15,6 +16,7 @@ static uint32_t audio_device_id;
 static uint32_t audio_sample_rate;
 static uint32_t audio_amplitude = DEFAULT_AMPLITUDE;
 static double audio_buzzer_freq;
+static uint8_t audio_nb_channel;
 static double audio_sample_per_sine;
 
 /*
@@ -29,9 +31,11 @@ audio_play_callback(void *user_data, Uint8 *stream, int len)
 {
     (void)user_data;
     float *fs = (float *)stream;
-    int fs_len = len / sizeof(float);
-    for (int i = 0; i < fs_len; ++i) {
-        fs[i] = audio_buzzer_buffer[audio_buffer_pos];
+    uint32_t fs_len = len / sizeof(float);
+    for (uint32_t i = 0; i < fs_len; i += audio_nb_channel) {
+        for (uint8_t j = 0; j < audio_nb_channel; ++j) {
+            fs[i + j] = audio_buzzer_buffer[audio_buffer_pos];
+        }
         audio_buffer_pos =
           (audio_buffer_pos + 1) % (uint32_t)audio_sample_per_sine;
     }
@@ -70,7 +74,7 @@ audio_init(char const **err)
     SDL_AudioSpec wanted = { .freq = DEFAULT_SAMPLE_RATE,
                              .format = AUDIO_F32,
                              .samples = DEFAULT_FRAME_PER_BUFFER,
-                             .channels = 1,
+                             .channels = DEFAULT_NB_CHANNEL,
                              .callback = audio_play_callback,
                              .userdata = NULL };
     SDL_AudioSpec get;
@@ -86,6 +90,7 @@ audio_init(char const **err)
         return (1);
     }
     audio_sample_rate = get.freq;
+    audio_nb_channel = get.channels;
     return (0);
 }
 
