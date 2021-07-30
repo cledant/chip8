@@ -22,6 +22,7 @@ static double eg_cycle_tick =
   1.0 / (ENGINE_DEFAULT_CYCLES_PER_FRAME * ENGINE_DRAW_RATE);
 static double eg_next_draw_timer;
 static double eg_next_cycle_timer;
+static uint64_t eg_options;
 
 static int
 process_event()
@@ -65,8 +66,9 @@ handle_timers()
  * Public API
  */
 int
-engine_init(uint32_t cycles_per_frame)
+engine_init(uint32_t cycles_per_frame, uint64_t options)
 {
+    eg_options = options;
     eg_cycle_tick = 1 / (double)(cycles_per_frame * ENGINE_DRAW_RATE);
     eg_next_draw_timer = tool_get_time();
     eg_next_cycle_timer = tool_get_time();
@@ -107,7 +109,9 @@ engine_loop()
         if (eg_should_draw) {
             emu_decrement_timers();
             int is_sound_active = emu_is_sound_active();
-            (is_sound_active) ? audio_play_buzzer() : audio_stop_buzzer();
+            (is_sound_active && !IS_ENGINE_OPTION_MUTE_SOUND(eg_options))
+              ? audio_play_buzzer()
+              : audio_stop_buzzer();
             renderer_draw(emu_fb, is_sound_active);
             eg_should_draw = 0;
         }

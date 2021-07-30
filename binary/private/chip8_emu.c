@@ -57,6 +57,7 @@ main(int argc, char const **argv)
                   ARGS_DEFAULT_SCALE,
                   0,
                   0,
+                  0,
                   ARGS_DEFAULT_BACKGROUND_COLOR,
                   ARGS_DEFAULT_SPRITE_COLOR,
                   ARGS_DEFAULT_SILENT_COLOR,
@@ -68,7 +69,7 @@ main(int argc, char const **argv)
 
     char const *err = NULL;
     if (emu_load_rom(
-          env.rom_path, env.rom_type, env.quirks, env.options, &err)) {
+          env.rom_path, env.rom_type, env.quirks, env.emu_options, &err)) {
         shutdown(err);
         return (1);
     }
@@ -89,7 +90,7 @@ main(int argc, char const **argv)
         shutdown(err);
         return (1);
     }
-    engine_init(env.cycle_per_frame);
+    engine_init(env.cycle_per_frame, env.engine_options);
     engine_loop();
     shutdown(NULL);
     return (0);

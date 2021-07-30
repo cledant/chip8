@@ -20,6 +20,7 @@ show_help()
          "[-b BACKGROUND_COLOR]"
          "[-c CYCLE_PER_FRAME]"
          "[-i SILENT_COLOR]"
+         "[-m]"
          "[-p SPRITE_COLOR]"
          "[-s SCALE]"
          "[-t ROME_TYPE]"
@@ -31,6 +32,7 @@ show_help()
     puts("\t-c: Cycles per frames (Emulation speed). Default is 30.");
     printf("\t-i: Silent RGB color in hex format. Default is 0x%06x\n",
            ARGS_DEFAULT_SILENT_COLOR);
+    puts("\t-m: Mute buzzer sound.");
     printf("\t-p: Sprite RGB color in hex format. Default is 0x%06x\n",
            ARGS_DEFAULT_SPRITE_COLOR);
     puts("\t-s: Resolution scaling from original resolution. Default is 8.");
@@ -231,32 +233,31 @@ parse_args(t_env *env, int argc, char const **argv)
      */
     static char const *options[] = { "-h", "--help", "-t", "-c", "-s",
                                      "-W", "-B",     "-u", "-b", "-p",
-                                     "-i", "-z",     "-A" };
+                                     "-i", "-z",     "-A", "-m" };
     static args_parse_t const fct_ptr[] = {
-        parse_help,     parse_help,      parse_emu_type,  parse_long,
-        parse_long,     parse_bit_field, parse_bit_field, parse_double,
-        parse_long,     parse_long,      parse_long,      parse_long,
-        parse_bit_field
+        parse_help,      parse_help,      parse_emu_type,  parse_long,
+        parse_long,      parse_bit_field, parse_bit_field, parse_double,
+        parse_long,      parse_long,      parse_long,      parse_long,
+        parse_bit_field, parse_bit_field
     };
 
     /*
      * Fct Ptr args arrays
      */
-    void *ptrs[] = {
-        NULL,
-        NULL,
-        &env->rom_type,
-        &env->cycle_per_frame,
-        &env->scale,
-        &env->quirks,
-        &env->quirks,
-        &env->buzzer_tone,
-        &env->background_color,
-        &env->sprite_color,
-        &env->silent_color,
-        &env->buzzer_color,
-        &env->options,
-    };
+    void *ptrs[] = { NULL,
+                     NULL,
+                     &env->rom_type,
+                     &env->cycle_per_frame,
+                     &env->scale,
+                     &env->quirks,
+                     &env->quirks,
+                     &env->buzzer_tone,
+                     &env->background_color,
+                     &env->sprite_color,
+                     &env->silent_color,
+                     &env->buzzer_color,
+                     &env->emu_options,
+                     &env->engine_options };
     static char const *err_msg[] = {
         NULL,
         NULL,
@@ -270,11 +271,12 @@ parse_args(t_env *env, int argc, char const **argv)
         "chip8_emu: SPRITE_COLOR is not a number",
         "chip8_emu: SILENT_COLOR is not a number",
         "chip8_emu: BUZZER_COLOR is not a number",
+        NULL,
         NULL
     };
     static uint64_t const others[] = {
-        0, 0,  0,  10, 10, EMU_QUIRK_DRAW_WRAP,        EMU_QUIRK_BXNN_INST,
-        0, 16, 16, 16, 16, EMU_OPTION_WARN_NOT_ALIGNED
+        0, 0,  0,  10, 10, EMU_QUIRK_DRAW_WRAP,         EMU_QUIRK_BXNN_INST,
+        0, 16, 16, 16, 16, EMU_OPTION_WARN_NOT_ALIGNED, ENGINE_OPTION_MUTE_SOUND
     };
 
     if (argc == 1) {

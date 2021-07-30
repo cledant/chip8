@@ -96,7 +96,7 @@ handle_key(SDL_Event *sdl_ev)
 int
 input_init(char const **err)
 {
-    if (SDL_InitSubSystem(SDL_INIT_VIDEO)) {
+    if (SDL_InitSubSystem(SDL_INIT_EVENTS)) {
         if (err) {
             *err = "Failed to Init SDL2 Video";
         }
@@ -109,7 +109,7 @@ input_init(char const **err)
 void
 input_destroy()
 {
-    SDL_QuitSubSystem(SDL_INIT_VIDEO);
+    SDL_QuitSubSystem(SDL_INIT_EVENTS);
 }
 
 int

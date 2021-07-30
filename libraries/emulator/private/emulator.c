@@ -103,9 +103,9 @@ setup_specific_rom_type(uint64_t quirks, char const **err)
             emu_nb_inst = EMU_CHIP8_NB_INST;
             emu_parse_fcts = g_chip8_parse_fcts;
             g_chip8_parse_fcts[EMU_CHIP8_DRAW_INST] =
-              (IS_QUIRK_DRAW_WRAP(quirks)) ? chip8_is_draw_wrap : chip8_is_draw;
+              (IS_EMU_QUIRK_DRAW_WRAP(quirks)) ? chip8_is_draw_wrap : chip8_is_draw;
             g_chip8_parse_fcts[EMU_CHIP8_JP_VO_ADDR] =
-              (IS_QUIRK_BXNN_INST(quirks)) ? chip8_is_jp_v0_addr_quirk
+              (IS_EMU_QUIRK_BXNN_INST(quirks)) ? chip8_is_jp_v0_addr_quirk
                                            : chip8_is_jp_v0_addr;
             return (0);
         case EMU_RT_SUPER_CHIP_8:
@@ -114,7 +114,7 @@ setup_specific_rom_type(uint64_t quirks, char const **err)
             emu_nb_inst = EMU_SUPER_CHIP8_NB_INST;
             emu_parse_fcts = g_superchip8_parse_fcts;
             g_superchip8_parse_fcts[EMU_CHIP8_JP_VO_ADDR] =
-              (IS_QUIRK_BXNN_INST(quirks)) ? chip8_is_jp_v0_addr_quirk
+              (IS_EMU_QUIRK_BXNN_INST(quirks)) ? chip8_is_jp_v0_addr_quirk
                                            : chip8_is_jp_v0_addr;
             // TODO : add draw inst
             return (0);
@@ -124,9 +124,9 @@ setup_specific_rom_type(uint64_t quirks, char const **err)
             emu_nb_inst = EMU_CHIP8_NB_INST;
             emu_parse_fcts = g_chip8_cosmac_parse_fcts;
             g_chip8_cosmac_parse_fcts[EMU_CHIP8_DRAW_INST] =
-              (IS_QUIRK_DRAW_WRAP(quirks)) ? chip8_is_draw_wrap : chip8_is_draw;
+              (IS_EMU_QUIRK_DRAW_WRAP(quirks)) ? chip8_is_draw_wrap : chip8_is_draw;
             g_chip8_cosmac_parse_fcts[EMU_CHIP8_JP_VO_ADDR] =
-              (IS_QUIRK_BXNN_INST(quirks)) ? chip8_is_jp_v0_addr_quirk
+              (IS_EMU_QUIRK_BXNN_INST(quirks)) ? chip8_is_jp_v0_addr_quirk
                                            : chip8_is_jp_v0_addr;
             return (0);
         case EMU_RT_NONE:
@@ -232,7 +232,7 @@ emu_fetch(char const **err)
         return (0);
     }
     if (emu_state.registers.program_counter % 2 &&
-        IS_OPTION_WARN_NOT_ALIGNED(emu_options)) {
+        IS_EMU_OPTION_WARN_NOT_ALIGNED(emu_options)) {
         printf("[WARN][FETCH]: PC (%x) not even aligned\n",
                emu_state.registers.program_counter);
     }

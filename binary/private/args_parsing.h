@@ -2,6 +2,7 @@
 #define CHIP8_EMU_ARGS_PARSING_H
 
 #include "emulator.h"
+#include "engine.h"
 
 #define ARGS_DEFAULT_SCALE 8
 #define ARGS_DEFAULT_BACKGROUND_COLOR 0x222222
@@ -18,7 +19,8 @@ typedef struct s_env
     long cycle_per_frame;
     long scale;
     uint64_t quirks;
-    uint64_t options;
+    uint64_t emu_options;
+    uint64_t engine_options;
     long background_color;
     long sprite_color;
     long silent_color;
