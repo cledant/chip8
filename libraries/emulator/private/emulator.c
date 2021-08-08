@@ -17,6 +17,8 @@
 #define EMU_KEY_RELEASED 0
 #define EMU_ERR_BUFFER_SIZE 1024
 
+#define ARRAY_SIZE(arr) (sizeof(arr) / sizeof(arr[0]))
+
 /*
  * Emulator variables
  */
@@ -71,7 +73,7 @@ open_rom_file(char const *rom_path,
     }
     if (fseek(*rom_file, 0, SEEK_END)) {
         if (err) {
-            *err = "fseek failed";
+            *err = "Fseek failed";
         }
         return (1);
     }
@@ -86,7 +88,7 @@ open_rom_file(char const *rom_path,
     if (fseek(*rom_file, 0, SEEK_SET)) {
         fclose(*rom_file);
         if (err) {
-            *err = "fseek failed";
+            *err = "Fseek failed";
         }
         return (1);
     }
@@ -159,6 +161,12 @@ emu_load_rom(char const *rom_path,
     FILE *rom_file = NULL;
     long rom_size = 0;
 
+    if (!rom_path) {
+        if (err) {
+            *err = "Empty rom path";
+        }
+        return (1);
+    }
     if (open_rom_file(rom_path, &rom_size, &rom_file, err)) {
         return (1);
     }
@@ -328,17 +336,75 @@ emu_should_exit()
 int
 emu_open_flag_registers_file(char const *filepath, char const **err)
 {
-    // TODO
-    (void)filepath;
-    (void)err;
-    return 0;
+    if (!filepath) {
+        if (err) {
+            *err = "Empty filepath";
+        }
+        return (1);
+    }
+
+    FILE *file = fopen(filepath, "r");
+    if (!file) {
+        if (err) {
+            *err = "Fopen failed";
+        }
+        return (1);
+    }
+    if (fseek(file, 0, SEEK_END)) {
+        if (err) {
+            *err = "Fseek failed";
+        }
+        return (1);
+    }
+    long flag_registers_size = ARRAY_SIZE(emu_state.registers.flag_registers);
+    long file_size = ftell(file);
+    if (file_size > flag_registers_size || file_size < 0) {
+        fclose(file);
+        if (err) {
+            *err = "Flag registers file too big";
+        }
+        return (1);
+    }
+    if (fseek(file, 0, SEEK_SET)) {
+        fclose(file);
+        if (err) {
+            *err = "Fseek failed";
+        }
+        return (1);
+    }
+    if (fread(
+          emu_state.registers.flag_registers, 1, flag_registers_size, file) !=
+        (size_t)flag_registers_size) {
+        fclose(file);
+        if (err) {
+            *err = "Failed to read Rom";
+        }
+        return (1);
+    }
+    return (0);
 }
 
 int
 emu_save_flag_registers_to_file(char const *filepath, char const **err)
 {
-    // TODO
-    (void)filepath;
-    (void)err;
+    if (!filepath) {
+        if (err) {
+            *err = "Empty filepath";
+        }
+        return (1);
+    }
+
+    FILE *file = fopen(filepath, "w");
+    if (!file) {
+        if (err) {
+            *err = "Fopen failed";
+        }
+        return (1);
+    }
+    fwrite(emu_state.registers.flag_registers,
+           ARRAY_SIZE(emu_state.registers.flag_registers),
+           1,
+           file);
+    fclose(file);
     return 0;
 }

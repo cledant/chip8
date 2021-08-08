@@ -357,25 +357,49 @@ superchip8_exec_ld_digit_addr_addr_register(emu_inst_t inst,
 int
 superchip8_exec_ld_store_rpl(emu_inst_t inst, void *state, char const **err)
 {
-    // TODO
     /*
      * Opcode FX75
      */
-    (void)inst;
-    (void)state;
-    (void)err;
+    if (inst.n2 > 7) {
+        snprintf(superchip8_err_buffer,
+                 SUPERCHIP8_ERROR_BUFFER_SIZE,
+                 "Instruction FX75 tried to store flag register"
+                 " outside the allowed range: %d. Max allowed=%d",
+                 inst.n2,
+                 EMU_MAX_FLAG_REGISTERS);
+        if (err) {
+            *err = superchip8_err_buffer;
+        }
+        return (1);
+    }
+    emu_state_t *es = state;
+    emu_registers_state_t *rs = &es->registers;
+
+    rs->flag_registers[inst.n2] = rs->general_registers[inst.n2];
     return (0);
 }
 
 int
 superchip8_exec_ld_read_rpl(emu_inst_t inst, void *state, char const **err)
 {
-    // TODO
     /*
      * Opcode FX85
      */
-    (void)inst;
-    (void)state;
-    (void)err;
+    if (inst.n2 > 7) {
+        snprintf(superchip8_err_buffer,
+                 SUPERCHIP8_ERROR_BUFFER_SIZE,
+                 "Instruction FX85 tried to load flag register"
+                 " outside the allowed range: %d. Max allowed=%d",
+                 inst.n2,
+                 EMU_MAX_FLAG_REGISTERS);
+        if (err) {
+            *err = superchip8_err_buffer;
+        }
+        return (1);
+    }
+    emu_state_t *es = state;
+    emu_registers_state_t *rs = &es->registers;
+
+    rs->general_registers[inst.n2] = rs->flag_registers[inst.n2];
     return (0);
 }
