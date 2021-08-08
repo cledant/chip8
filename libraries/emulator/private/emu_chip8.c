@@ -421,7 +421,9 @@ chip8_exec_ret(emu_inst_t inst, void *state, char const **err)
                  CHIP8_ERROR_BUFFER_SIZE,
                  "RET at %x on empty stack pointer",
                  rs->program_counter - 2);
-        *err = chip8_err_buffer;
+        if (err) {
+            *err = chip8_err_buffer;
+        }
         return (1);
     }
     rs->program_counter = rs->stack_pointer[rs->current_stack--];
@@ -819,7 +821,9 @@ chip8_exec_draw(emu_inst_t inst, void *state, char const **err)
                                                  fb_bit_pos,
                                                  es->max_addr,
                                                  es->max_fb)) {
-                *err = chip8_err_buffer;
+                if (err) {
+                    *err = chip8_err_buffer;
+                }
                 return (1);
             }
             uint8_t sprite_bit =
@@ -999,7 +1003,9 @@ chip8_exec_ld_bcd_addr(emu_inst_t inst, void *state, char const **err)
                      "range at 0x%x. Max allowed=Ox%x",
                      rs->address_register + i,
                      es->max_addr);
-            *err = chip8_err_buffer;
+            if (err) {
+                *err = chip8_err_buffer;
+            }
             return (1);
         }
         es->ram[rs->address_register + i] =
@@ -1016,7 +1022,6 @@ chip8_exec_ld_store_register(emu_inst_t inst, void *state, char const **err)
     /*
      * Opcode FX55
      */
-    (void)err;
     emu_state_t *es = state;
     emu_registers_state_t *rs = &es->registers;
 
@@ -1028,7 +1033,9 @@ chip8_exec_ld_store_register(emu_inst_t inst, void *state, char const **err)
                      "range at 0x%x. Max allowed=Ox%x",
                      rs->address_register + i,
                      es->max_addr);
-            *err = chip8_err_buffer;
+            if (err) {
+                *err = chip8_err_buffer;
+            }
             return (1);
         }
         es->ram[rs->address_register + i] = rs->general_registers[i];
@@ -1042,7 +1049,6 @@ chip8_exec_ld_read_register(emu_inst_t inst, void *state, char const **err)
     /*
      * Opcode FX65
      */
-    (void)err;
     emu_state_t *es = state;
     emu_registers_state_t *rs = &es->registers;
 
@@ -1054,7 +1060,9 @@ chip8_exec_ld_read_register(emu_inst_t inst, void *state, char const **err)
                      "range at 0x%x. Max allowed=Ox%x",
                      rs->address_register + i,
                      es->max_addr);
-            *err = chip8_err_buffer;
+            if (err) {
+                *err = chip8_err_buffer;
+            }
             return (1);
         }
         rs->general_registers[i] = es->ram[rs->address_register + i];

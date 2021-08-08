@@ -46,5 +46,7 @@ int emu_execute(char const **err);
 void const *emu_get_framebuffer();
 int emu_is_sound_active();
 int emu_should_exit();
+int emu_open_flag_registers_file(char const *filepath, char const **err);
+int emu_save_flag_registers_to_file(char const *filepath, char const **err);
 
 #endif // CHIP8_EMULATOR_H

@@ -8,6 +8,8 @@
 #include "engine.h"
 #include "args_parsing.h"
 
+#define FLAG_REGISTER_FILEPATH "./flag_regs.sav"
+
 static void
 shutdown(char const *msg)
 {
@@ -62,7 +64,10 @@ main(int argc, char const **argv)
                   ARGS_DEFAULT_SPRITE_COLOR,
                   ARGS_DEFAULT_SILENT_COLOR,
                   ARGS_DEFAULT_BUZZER_COLOR,
-                  ARGS_DEFAULT_BUZZER_TONE };
+                  ARGS_DEFAULT_BUZZER_TONE,
+                  ARGS_DEFAULT_LOAD_FLAG_REGISTERS,
+                  ARGS_DEFAULT_SAVE_FLAG_REGISTERS };
+
     if (parse_args(&env, argc, argv)) {
         return (1);
     }
@@ -72,6 +77,12 @@ main(int argc, char const **argv)
           env.rom_path, env.rom_type, env.quirks, env.emu_options, &err)) {
         shutdown(err);
         return (1);
+    }
+    if (env.rom_type == EMU_RT_SUPER_CHIP_8 && !env.reset_user_flags) {
+        if (emu_open_flag_registers_file(FLAG_REGISTER_FILEPATH, &err)) {
+            printf("chip8_emu: failed to open flag registers savefile: %s\n",
+                   err);
+        }
     }
     if (open_renderer(env.scale,
                       env.background_color,
@@ -92,6 +103,12 @@ main(int argc, char const **argv)
     }
     engine_init(env.cycle_per_frame, env.engine_options);
     engine_loop();
+    if (env.rom_type == EMU_RT_SUPER_CHIP_8 && !env.dont_save_user_flags) {
+        if (emu_save_flag_registers_to_file(FLAG_REGISTER_FILEPATH, &err)) {
+            printf("chip8_emu: failed to save flag registers savefile: %s\n",
+                   err);
+        }
+    }
     shutdown(NULL);
     return (0);
 }

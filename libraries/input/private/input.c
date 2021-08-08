@@ -134,7 +134,9 @@ input_get(char const **err)
                 break;
         }
         if (ret) {
-            *err = "Event Queue is full";
+            if (err) {
+                *err = "Event Queue is full";
+            }
             return (1);
         }
     }

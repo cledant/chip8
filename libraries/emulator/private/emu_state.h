@@ -19,7 +19,7 @@
 #define EMU_MAX_ROM_SIZE (EMU_RAM_SIZE - EMU_CHIP8_RAM_ENTRY_POINT)
 #define EMU_MAX_STACK_SIZE 16
 #define EMU_MAX_GENERAL_REGISTERS 16
-#define EMU_MAX_RPL_USER_FLAGS 8
+#define EMU_MAX_FLAG_REGISTERS 8
 #define EMU_NB_KEYS 16
 #define EMU_CHIP_8_FONT_HEIGHT 5
 #define EMU_NB_FONTS 16
@@ -30,7 +30,7 @@
 typedef struct s_emu_registers_state
 {
     uint8_t general_registers[EMU_MAX_GENERAL_REGISTERS];
-    uint8_t rpl_user_flags[EMU_MAX_RPL_USER_FLAGS];
+    uint8_t flag_registers[EMU_MAX_FLAG_REGISTERS];
     uint16_t address_register;
     uint16_t program_counter;
     uint16_t stack_pointer[EMU_MAX_STACK_SIZE];

@@ -144,7 +144,6 @@ chip8_cosmac_vip_exec_ld_store_register(emu_inst_t inst,
     /*
      * Opcode FX55
      */
-    (void)err;
     emu_state_t *es = state;
     emu_registers_state_t *rs = &es->registers;
 
@@ -156,7 +155,9 @@ chip8_cosmac_vip_exec_ld_store_register(emu_inst_t inst,
                      "range at 0x%x. Max allowed=Ox%x",
                      rs->address_register + i,
                      es->max_addr);
-            *err = chip8_cosmac_err_buffer;
+            if (err) {
+                *err = chip8_cosmac_err_buffer;
+            }
             return (1);
         }
         es->ram[rs->address_register + i] = rs->general_registers[i];
@@ -173,7 +174,6 @@ chip8_cosmac_vip_exec_ld_read_register(emu_inst_t inst,
     /*
      * Opcode FX65
      */
-    (void)err;
     emu_state_t *es = state;
     emu_registers_state_t *rs = &es->registers;
 
@@ -185,7 +185,9 @@ chip8_cosmac_vip_exec_ld_read_register(emu_inst_t inst,
                      "range at 0x%x. Max allowed=Ox%x",
                      rs->address_register + i,
                      es->max_addr);
-            *err = chip8_cosmac_err_buffer;
+            if (err) {
+                *err = chip8_cosmac_err_buffer;
+            }
             return (1);
         }
         rs->general_registers[i] = es->ram[rs->address_register + i];

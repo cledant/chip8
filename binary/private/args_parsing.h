@@ -11,6 +11,8 @@
 #define ARGS_DEFAULT_BUZZER_COLOR 0x555555
 #define ARGS_DEFAULT_BUZZER_TONE 2000.0
 #define ARGS_DEFAULT_CYCLES_PER_FRAME 30
+#define ARGS_DEFAULT_LOAD_FLAG_REGISTERS 1
+#define ARGS_DEFAULT_SAVE_FLAG_REGISTERS 1
 
 typedef struct s_env
 {
@@ -26,6 +28,8 @@ typedef struct s_env
     long silent_color;
     long buzzer_color;
     double buzzer_tone;
+    int reset_user_flags;
+    int dont_save_user_flags;
 } t_env;
 
 int parse_args(t_env *env, int argc, char const **argv);

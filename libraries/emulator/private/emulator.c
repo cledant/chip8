@@ -64,34 +64,34 @@ open_rom_file(char const *rom_path,
 {
     *rom_file = fopen(rom_path, "r");
     if (!*rom_file) {
-        *err = "Failed to open rom";
+        if (err) {
+            *err = "Failed to open rom";
+        }
         return (1);
     }
     if (fseek(*rom_file, 0, SEEK_END)) {
-        *err = "fseek failed";
+        if (err) {
+            *err = "fseek failed";
+        }
         return (1);
     }
     *rom_size = ftell(*rom_file);
     if (*rom_size > EMU_MAX_ROM_SIZE || *rom_size < 0) {
         fclose(*rom_file);
-        *err = "Rom file too big";
+        if (err) {
+            *err = "Rom file too big";
+        }
         return (1);
     }
     if (fseek(*rom_file, 0, SEEK_SET)) {
         fclose(*rom_file);
-        *err = "fseek failed";
+        if (err) {
+            *err = "fseek failed";
+        }
         return (1);
     }
     return (0);
 }
-
-/*
- * Public Api
- */
-char const *g_emu_rom_types_str[EMU_RT_NB_TYPES] = { "NONE",
-                                                     "CHIP8",
-                                                     "SUPERCHIP8",
-                                                     "CHIP8_COSMAC_VIP" };
 
 static int
 setup_specific_rom_type(uint64_t quirks, char const **err)
@@ -103,10 +103,11 @@ setup_specific_rom_type(uint64_t quirks, char const **err)
             emu_nb_inst = EMU_CHIP8_NB_INST;
             emu_parse_fcts = g_chip8_parse_fcts;
             g_chip8_parse_fcts[EMU_CHIP8_DRAW_INST] =
-              (IS_EMU_QUIRK_DRAW_WRAP(quirks)) ? chip8_is_draw_wrap : chip8_is_draw;
+              (IS_EMU_QUIRK_DRAW_WRAP(quirks)) ? chip8_is_draw_wrap
+                                               : chip8_is_draw;
             g_chip8_parse_fcts[EMU_CHIP8_JP_VO_ADDR] =
               (IS_EMU_QUIRK_BXNN_INST(quirks)) ? chip8_is_jp_v0_addr_quirk
-                                           : chip8_is_jp_v0_addr;
+                                               : chip8_is_jp_v0_addr;
             return (0);
         case EMU_RT_SUPER_CHIP_8:
             emu_state.max_addr = EMU_SUPER_CHIP8_MAX_PROG_RAM_ADDR;
@@ -115,7 +116,7 @@ setup_specific_rom_type(uint64_t quirks, char const **err)
             emu_parse_fcts = g_superchip8_parse_fcts;
             g_superchip8_parse_fcts[EMU_CHIP8_JP_VO_ADDR] =
               (IS_EMU_QUIRK_BXNN_INST(quirks)) ? chip8_is_jp_v0_addr_quirk
-                                           : chip8_is_jp_v0_addr;
+                                               : chip8_is_jp_v0_addr;
             // TODO : add draw inst
             return (0);
         case EMU_RT_CHIP_8_COSMAC_VIP:
@@ -124,18 +125,29 @@ setup_specific_rom_type(uint64_t quirks, char const **err)
             emu_nb_inst = EMU_CHIP8_NB_INST;
             emu_parse_fcts = g_chip8_cosmac_vip_parse_fcts;
             g_chip8_cosmac_vip_parse_fcts[EMU_CHIP8_DRAW_INST] =
-              (IS_EMU_QUIRK_DRAW_WRAP(quirks)) ? chip8_is_draw_wrap : chip8_is_draw;
+              (IS_EMU_QUIRK_DRAW_WRAP(quirks)) ? chip8_is_draw_wrap
+                                               : chip8_is_draw;
             g_chip8_cosmac_vip_parse_fcts[EMU_CHIP8_JP_VO_ADDR] =
               (IS_EMU_QUIRK_BXNN_INST(quirks)) ? chip8_is_jp_v0_addr_quirk
-                                           : chip8_is_jp_v0_addr;
+                                               : chip8_is_jp_v0_addr;
             return (0);
         case EMU_RT_NONE:
         default:
-            *err = "Loading invalid rom type";
+            if (err) {
+                *err = "Loading invalid rom type";
+            }
             emu_rom_type = EMU_RT_NONE;
             return (1);
     }
 }
+
+/*
+ * Public Api
+ */
+char const *g_emu_rom_types_str[EMU_RT_NB_TYPES] = { "NONE",
+                                                     "CHIP8",
+                                                     "SUPERCHIP8",
+                                                     "CHIP8_COSMAC_VIP" };
 
 int
 emu_load_rom(char const *rom_path,
@@ -158,7 +170,9 @@ emu_load_rom(char const *rom_path,
           emu_state.ram + EMU_CHIP8_RAM_ENTRY_POINT, 1, rom_size, rom_file) !=
         (size_t)rom_size) {
         fclose(rom_file);
-        *err = "Failed to read Rom";
+        if (err) {
+            *err = "Failed to read Rom";
+        }
         return (1);
     }
     fclose(rom_file);
@@ -243,7 +257,9 @@ emu_fetch(char const **err)
           "Program counter is outside allowed range=0x%x. Max allowed=0x%x",
           emu_state.registers.program_counter,
           emu_state.max_addr);
-        *err = emu_err_buffer;
+        if (err) {
+            *err = emu_err_buffer;
+        }
         emu_curr_inst = (emu_inst_t){ .n1 = 0, .n2 = 0, .n3 = 0, .n4 = 0 };
         return (1);
     }
@@ -274,7 +290,9 @@ emu_decode(char const **err)
              emu_curr_inst.n3,
              emu_curr_inst.n4,
              emu_state.registers.program_counter - 2);
-    *err = emu_err_buffer;
+    if (err) {
+        *err = emu_err_buffer;
+    }
     return (1);
 }
 
@@ -305,4 +323,22 @@ int
 emu_should_exit()
 {
     return (emu_state.should_exit);
+}
+
+int
+emu_open_flag_registers_file(char const *filepath, char const **err)
+{
+    // TODO
+    (void)filepath;
+    (void)err;
+    return 0;
+}
+
+int
+emu_save_flag_registers_to_file(char const *filepath, char const **err)
+{
+    // TODO
+    (void)filepath;
+    (void)err;
+    return 0;
 }

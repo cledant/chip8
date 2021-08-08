@@ -319,7 +319,9 @@ superchip8_exec_draw(emu_inst_t inst, void *state, char const **err)
                                                  fb_bit_pos,
                                                  es->max_addr,
                                                  es->max_fb)) {
-                *err = superchip8_err_buffer;
+                if (err) {
+                    *err = superchip8_err_buffer;
+                }
                 return (1);
             }
             uint8_t sprite_bit =

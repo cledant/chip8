@@ -51,7 +51,9 @@ generate_buzzer(char const **err)
 
     if (!(audio_buzzer_buffer =
             (float *)malloc((uint32_t)audio_sample_per_sine * sizeof(float)))) {
-        *err = "Failed to allocate buzzer buffer";
+        if (err) {
+            *err = "Failed to allocate buzzer buffer";
+        }
         return (1);
     }
     for (uint32_t i = 0; i < (uint32_t)audio_sample_per_sine; ++i) {
@@ -68,7 +70,9 @@ int
 audio_init(char const **err)
 {
     if (SDL_InitSubSystem(SDL_INIT_AUDIO)) {
-        *err = "Failed to init audio";
+        if (err) {
+            *err = "Failed to init audio";
+        }
         return (1);
     }
     SDL_AudioSpec wanted = { .freq = DEFAULT_SAMPLE_RATE,
@@ -86,7 +90,9 @@ audio_init(char const **err)
             &get,
             SDL_AUDIO_ALLOW_CHANNELS_CHANGE | SDL_AUDIO_ALLOW_FREQUENCY_CHANGE |
               SDL_AUDIO_ALLOW_SAMPLES_CHANGE))) {
-        *err = "Failed to get audio device";
+        if (err) {
+            *err = "Failed to get audio device";
+        }
         return (1);
     }
     audio_sample_rate = get.freq;
@@ -111,7 +117,6 @@ audio_destroy()
 int
 audio_set_buzzer_params(double freq, uint32_t amplitude, char const **err)
 {
-    (void)err;
     audio_buzzer_freq = fabs(freq);
     audio_amplitude = amplitude;
     audio_sample_per_sine = (double)audio_sample_rate / audio_buzzer_freq;

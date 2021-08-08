@@ -31,9 +31,9 @@ typedef enum e_color_type
  */
 static renderer_t rdr_env;
 static uint32_t rdr_emu_colors_rgb[RDR_CT_NB_COLOR] = { 0x222222,
-                                                       0x00BB00,
-                                                       0x000000,
-                                                       0x555555 };
+                                                        0x00BB00,
+                                                        0x000000,
+                                                        0x555555 };
 
 /*
  * Internal functions
@@ -98,13 +98,17 @@ renderer_create_window(int32_t w,
                        h + border_px * 2,
                        SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if (!rdr_env.win) {
-        *err = "Failed to create window";
+        if (err) {
+            *err = "Failed to create window";
+        }
         return (1);
     }
     rdr_env.renderer =
       SDL_CreateRenderer(rdr_env.win, -1, SDL_RENDERER_PRESENTVSYNC);
     if (!rdr_env.renderer) {
-        *err = "Failed to create renderer";
+        if (err) {
+            *err = "Failed to create renderer";
+        }
         return (1);
     }
     rdr_env.tex_pos.w = w;
@@ -137,7 +141,9 @@ renderer_create_framebuffer(int32_t fb_w, int32_t fb_h, char const **err)
                                     fb_w,
                                     fb_h);
     if (!rdr_env.tex) {
-        *err = "Failed to create renderer texture";
+        if (err) {
+            *err = "Failed to create renderer texture";
+        }
         return (1);
     }
     rdr_env.fb_w = fb_w;

@@ -22,8 +22,10 @@ show_help()
          "[-h | --help]"
          "[-i SILENT_COLOR]"
          "[-k | --keys]"
+         "[-n]"
          "[-m]"
          "[-p SPRITE_COLOR]"
+         "[-r]"
          "[-s SCALE]"
          "[-t ROME_TYPE]"
          "[-u BUZZER_TONE]"
@@ -36,9 +38,11 @@ show_help()
     printf("\t-i: Silent RGB color in hex format. Default is 0x%06x\n",
            ARGS_DEFAULT_SILENT_COLOR);
     puts("\t-k | --keys: Display key mapping.");
+    puts("\t-n: Will not save flag registers at exit. Only for SUPERCHIP8.");
     puts("\t-m: Mute buzzer sound.");
     printf("\t-p: Sprite RGB color in hex format. Default is 0x%06x\n",
            ARGS_DEFAULT_SPRITE_COLOR);
+    puts("\t-r: Reset flag registers. Only for SUPERCHIP8 Roms.");
     puts("\t-s: Resolution scaling from original resolution. Default is 8.");
     puts("\t-t: Rom Type can be CHIP8_COSMAC_VIP, CHIP8, SUPERCHIP8. Default "
          "is CHIP8.");
@@ -175,7 +179,7 @@ parse_double(void *var,
 {
     (void)other;
     if (!var || !cur_arg || !argv) {
-        puts("chip8_emu: empty ptr when parsing long");
+        puts("chip8_emu: empty ptr when parsing double");
         return (1);
     }
     if (*cur_arg + 1 >= max_args) {
@@ -206,7 +210,7 @@ parse_bit_field(void *var,
                 uint64_t const *other)
 {
     if (!var || !other) {
-        puts("chip8_emu: empty ptr when parsing wrap");
+        puts("chip8_emu: empty ptr when parsing bitfield");
         return (1);
     }
     (void)cur_arg;
@@ -215,6 +219,28 @@ parse_bit_field(void *var,
     (void)err_msg;
     uint64_t *ptr = var;
     *ptr |= *other;
+    return (0);
+}
+
+static int
+parse_bool(void *var,
+           int *cur_arg,
+           int max_args,
+           char const **argv,
+           char const *err_msg,
+           uint64_t const *other)
+{
+    if (!var) {
+        puts("chip8_emu: empty ptr when parsing bool");
+        return (1);
+    }
+    (void)cur_arg;
+    (void)max_args;
+    (void)argv;
+    (void)err_msg;
+    (void)other;
+    int *ptr = var;
+    *ptr = 1;
     return (0);
 }
 
@@ -265,14 +291,16 @@ parse_args(t_env *env, int argc, char const **argv)
     /*
      * Parsing related arrays
      */
-    static char const *options[] = { "-h", "--help", "-t", "-c",    "-s", "-W",
-                                     "-B", "-u",     "-b", "-p",    "-i", "-z",
-                                     "-A", "-m",     "-k", "--keys" };
+    static char const *options[] = {
+        "-h", "--help", "-t", "-c", "-s", "-W", "-B",     "-u", "-b",
+        "-p", "-i",     "-z", "-A", "-m", "-k", "--keys", "-n", "-r"
+    };
     static args_parse_t const fct_ptr[] = {
         parse_help,      parse_help,      parse_emu_type,  parse_long,
         parse_long,      parse_bit_field, parse_bit_field, parse_double,
         parse_long,      parse_long,      parse_long,      parse_long,
-        parse_bit_field, parse_bit_field, parse_keys,      parse_keys
+        parse_bit_field, parse_bit_field, parse_keys,      parse_keys,
+        parse_bool,      parse_bool
     };
 
     /*
@@ -293,7 +321,9 @@ parse_args(t_env *env, int argc, char const **argv)
                      &env->emu_options,
                      &env->engine_options,
                      NULL,
-                     NULL };
+                     NULL,
+                     &env->dont_save_user_flags,
+                     &env->reset_user_flags };
     static char const *err_msg[] = {
         NULL,
         NULL,
@@ -307,6 +337,8 @@ parse_args(t_env *env, int argc, char const **argv)
         "chip8_emu: SPRITE_COLOR is not a number",
         "chip8_emu: SILENT_COLOR is not a number",
         "chip8_emu: BUZZER_COLOR is not a number",
+        NULL,
+        NULL,
         NULL,
         NULL,
         NULL,
@@ -326,6 +358,8 @@ parse_args(t_env *env, int argc, char const **argv)
                                        16,
                                        EMU_OPTION_WARN_NOT_ALIGNED,
                                        ENGINE_OPTION_MUTE_SOUND,
+                                       0,
+                                       0,
                                        0,
                                        0 };
 
