@@ -344,13 +344,28 @@ superchip8_exec_ld_digit_addr_addr_register(emu_inst_t inst,
                                             void *state,
                                             char const **err)
 {
-    // TODO
     /*
      * Opcode FX30
      */
-    (void)inst;
-    (void)state;
-    (void)err;
+    if (inst.n2 > (EMU_SUPER_CHIP_8_FONT - 1)) {
+        snprintf(superchip8_err_buffer,
+                 SUPERCHIP8_ERROR_BUFFER_SIZE,
+                 "Instruction FX30 tried to displayed hires font"
+                 " outside the allowed range: %d. Max allowed=%d",
+                 inst.n2,
+                 (EMU_SUPER_CHIP_8_FONT - 1));
+        if (err) {
+            *err = superchip8_err_buffer;
+        }
+        return (1);
+    }
+    emu_state_t *es = state;
+    emu_registers_state_t *rs = &es->registers;
+
+    rs->address_register =
+      rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_x] *
+        EMU_SUPER_CHIP_8_FONT_HEIGHT +
+      (EMU_CHIP8_NB_FONTS * EMU_CHIP_8_FONT_HEIGHT);
     return (0);
 }
 
@@ -360,13 +375,13 @@ superchip8_exec_ld_store_rpl(emu_inst_t inst, void *state, char const **err)
     /*
      * Opcode FX75
      */
-    if (inst.n2 > 7) {
+    if (inst.n2 > (EMU_NB_FLAG_REGISTERS - 1)) {
         snprintf(superchip8_err_buffer,
                  SUPERCHIP8_ERROR_BUFFER_SIZE,
                  "Instruction FX75 tried to store flag register"
                  " outside the allowed range: %d. Max allowed=%d",
                  inst.n2,
-                 EMU_MAX_FLAG_REGISTERS);
+                 EMU_NB_FLAG_REGISTERS);
         if (err) {
             *err = superchip8_err_buffer;
         }
@@ -385,13 +400,13 @@ superchip8_exec_ld_read_rpl(emu_inst_t inst, void *state, char const **err)
     /*
      * Opcode FX85
      */
-    if (inst.n2 > 7) {
+    if (inst.n2 > (EMU_NB_FLAG_REGISTERS - 1)) {
         snprintf(superchip8_err_buffer,
                  SUPERCHIP8_ERROR_BUFFER_SIZE,
                  "Instruction FX85 tried to load flag register"
                  " outside the allowed range: %d. Max allowed=%d",
                  inst.n2,
-                 EMU_MAX_FLAG_REGISTERS);
+                 EMU_NB_FLAG_REGISTERS);
         if (err) {
             *err = superchip8_err_buffer;
         }

@@ -10,6 +10,7 @@
 #define EMU_SUPER_CHIP8_NB_INST 45
 #define EMU_CHIP8_DRAW_INST 23
 #define EMU_CHIP8_JP_VO_ADDR 21
+#define EMU_SUPERCHIP8_JP_VO_ADDR 27
 
 /*
  * Structs
