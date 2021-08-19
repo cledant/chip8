@@ -110,11 +110,14 @@ chip8_cosmac_vip_exec_shr(emu_inst_t inst, void *state, char const **err)
     emu_state_t *es = state;
     emu_registers_state_t *rs = &es->registers;
 
-    rs->general_registers[0xF] =
-      rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_y] &
-      0b00000001;
+    uint8_t flag =
+      (rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_y] &
+       0b00000001)
+        ? 1
+        : 0;
     rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_x] =
       rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_y] >> 1;
+    rs->general_registers[0xF] = flag;
     return (0);
 }
 
@@ -128,11 +131,14 @@ chip8_cosmac_vip_exec_shl(emu_inst_t inst, void *state, char const **err)
     emu_state_t *es = state;
     emu_registers_state_t *rs = &es->registers;
 
-    rs->general_registers[0xF] =
-      rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_y] &
-      0b10000000;
+    uint8_t flag =
+      (rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_y] &
+       0b10000000)
+        ? 1
+        : 0;
     rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_x] =
       rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_y] << 1;
+    rs->general_registers[0xF] = flag;
     return (0);
 }
 

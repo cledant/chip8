@@ -1,8 +1,10 @@
 #include "emu_chip8.h"
 
 /*
- * This implementation will follow CHIP8 technical reference from
+ * This implementation will mostly follow CHIP8 technical reference from
  * http://devernay.free.fr/hacks/chip8/C8TECH10.HTM
+ * 8XY4 / 8XY5 / 8XY6 / 8XY7 / 8XYE will set VF as carry or borrow
+ * after they executed their operation
  */
 
 #include <string.h>
@@ -615,9 +617,9 @@ chip8_exec_add_register_register(emu_inst_t inst, void *state, char const **err)
     uint16_t add =
       rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_x] +
       rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_y];
-    rs->general_registers[0xF] = (add > 255) ? 1 : 0;
     rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_x] =
       0x00FF & add;
+    rs->general_registers[0xF] = (add > 255) ? 1 : 0;
     return (0);
 }
 
@@ -631,13 +633,14 @@ chip8_exec_sub(emu_inst_t inst, void *state, char const **err)
     emu_state_t *es = state;
     emu_registers_state_t *rs = &es->registers;
 
-    rs->general_registers[0xF] =
+    uint8_t flag =
       (rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_x] >
        rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_y])
         ? 1
         : 0;
     rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_x] -=
       rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_y];
+    rs->general_registers[0xF] = flag;
     return (0);
 }
 
@@ -651,12 +654,13 @@ chip8_exec_shr(emu_inst_t inst, void *state, char const **err)
     emu_state_t *es = state;
     emu_registers_state_t *rs = &es->registers;
 
-    rs->general_registers[0xF] =
+    uint8_t flag =
       (rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_x] &
        0b00000001)
         ? 1
         : 0;
     rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_x] /= 2;
+    rs->general_registers[0xF] = flag;
     return (0);
 }
 
@@ -670,7 +674,7 @@ chip8_exec_subn(emu_inst_t inst, void *state, char const **err)
     emu_state_t *es = state;
     emu_registers_state_t *rs = &es->registers;
 
-    rs->general_registers[0xF] =
+    uint8_t flag =
       (rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_y] >
        rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_x])
         ? 1
@@ -678,6 +682,7 @@ chip8_exec_subn(emu_inst_t inst, void *state, char const **err)
     rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_x] =
       rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_y] -
       rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_x];
+    rs->general_registers[0xF] = flag;
     return (0);
 }
 
@@ -691,12 +696,13 @@ chip8_exec_shl(emu_inst_t inst, void *state, char const **err)
     emu_state_t *es = state;
     emu_registers_state_t *rs = &es->registers;
 
-    rs->general_registers[0xF] =
+    uint8_t flag =
       (rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_x] &
        0b10000000)
         ? 1
         : 0;
     rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_x] *= 2;
+    rs->general_registers[0xF] = flag;
     return (0);
 }
 
