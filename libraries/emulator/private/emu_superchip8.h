@@ -10,6 +10,12 @@
 extern emu_parse_fct_t g_superchip8_parse_fcts[EMU_SUPER_CHIP8_NB_INST];
 
 /*
+ * Size
+ */
+#define EMU_SUPER_CHIP_8_LEFT_SCROLL_PX 4
+#define EMU_SUPER_CHIP_8_RIGHT_SCROLL_PX 4
+
+/*
  * Super Chip8 Inst Detection fct
  */
 emu_exec_fct_t superchip8_is_scd(emu_inst_t inst);

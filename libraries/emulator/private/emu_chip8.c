@@ -458,6 +458,18 @@ chip8_exec_call(emu_inst_t inst, void *state, char const **err)
     emu_registers_state_t *rs = &es->registers;
     emu_inst_addr_t inst_addr = emu_inst_to_emu_inst_addr(inst);
 
+    if (rs->current_stack >= EMU_MAX_STACK_SIZE) {
+        snprintf(
+          chip8_err_buffer,
+          CHIP8_ERROR_BUFFER_SIZE,
+          "Instruction 2NNN tried overflow stack at 0x%x. Max stack is %d",
+          rs->program_counter - 2,
+          EMU_MAX_STACK_SIZE);
+        if (err) {
+            *err = chip8_err_buffer;
+        }
+        return (1);
+    }
     rs->stack_pointer[++rs->current_stack] = rs->program_counter;
     rs->program_counter = inst_addr.addr;
     return (0);

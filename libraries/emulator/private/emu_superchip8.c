@@ -6,6 +6,7 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 
 #include "emu_inst.h"
 #include "emu_state.h"
@@ -187,26 +188,54 @@ superchip8_exec_scd(emu_inst_t inst, void *state, char const **err)
 int
 superchip8_exec_scr(emu_inst_t inst, void *state, char const **err)
 {
-    // TODO
     /*
      * Opcode 00FB
      */
     (void)inst;
-    (void)state;
     (void)err;
+
+    emu_state_t *es = state;
+    for (uint32_t i = 0; i < EMU_SUPER_CHIP8_FRAMEBUFFER_SIZE;
+         i += (EMU_SUPER_CHIP_8_W / 8)) {
+        uint64_t *ptr_left = (uint64_t *)&es->framebuffer[i];
+        uint64_t shifted_left_part = *ptr_left
+                                     << EMU_SUPER_CHIP_8_RIGHT_SCROLL_PX;
+
+        uint64_t *ptr_right =
+          (uint64_t *)&es->framebuffer[i + (EMU_SUPER_CHIP_8_W / 16)];
+        uint64_t shifted_right_part = *ptr_right
+                                      << EMU_SUPER_CHIP_8_RIGHT_SCROLL_PX;
+
+        *ptr_left = shifted_left_part;
+        *ptr_right = shifted_right_part;
+    }
     return (0);
 }
 
 int
 superchip8_exec_scl(emu_inst_t inst, void *state, char const **err)
 {
-    // TODO
     /*
      * Opcode 00FC
      */
     (void)inst;
-    (void)state;
     (void)err;
+
+    emu_state_t *es = state;
+    for (uint32_t i = 0; i < EMU_SUPER_CHIP8_FRAMEBUFFER_SIZE;
+         i += (EMU_SUPER_CHIP_8_W / 8)) {
+        uint64_t *ptr_left = (uint64_t *)&es->framebuffer[i];
+        uint64_t shifted_left_part =
+          *ptr_left >> EMU_SUPER_CHIP_8_LEFT_SCROLL_PX;
+
+        uint64_t *ptr_right =
+          (uint64_t *)&es->framebuffer[i + (EMU_SUPER_CHIP_8_W / 16)];
+        uint64_t shifted_right_part =
+          *ptr_right >> EMU_SUPER_CHIP_8_LEFT_SCROLL_PX;
+
+        *ptr_left = shifted_left_part;
+        *ptr_right = shifted_right_part;
+    }
     return (0);
 }
 
@@ -235,6 +264,7 @@ superchip8_exec_low(emu_inst_t inst, void *state, char const **err)
 
     emu_state_t *es = state;
     es->high_res_mode = 0;
+    memset(es->framebuffer, 0, EMU_FRAMEBUFFER_MAX_SIZE);
     return (0);
 }
 
@@ -249,6 +279,7 @@ superchip8_exec_high(emu_inst_t inst, void *state, char const **err)
 
     emu_state_t *es = state;
     es->high_res_mode = 1;
+    memset(es->framebuffer, 0, EMU_FRAMEBUFFER_MAX_SIZE);
     return (0);
 }
 
