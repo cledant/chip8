@@ -33,16 +33,23 @@ open_renderer(uint32_t scale,
     if (renderer_init(err)) {
         return (1);
     }
-    int32_t fb_w = 0;
-    int32_t fb_h = 0;
-    if (emu_get_framebuffer_size(&fb_w, &fb_h)) {
+    int32_t hires_w = 0;
+    int32_t hires_h = 0;
+    int32_t lores_w = 0;
+    int32_t lores_h = 0;
+    if (emu_get_high_res_size(&hires_w, &hires_h)) {
         *err = "Unknown type of chip";
         return (1);
     }
-    if (renderer_create_window(fb_w * scale, fb_h * scale, scale * 2, err)) {
+    if (emu_get_low_res_size(&lores_w, &lores_h)) {
+        *err = "Unknown type of chip";
         return (1);
     }
-    if (renderer_create_framebuffer(fb_w, fb_h, err)) {
+    if (renderer_create_window(
+          hires_w * scale, hires_h * scale, scale * 2, err)) {
+        return (1);
+    }
+    if (renderer_create_framebuffer(hires_w, hires_h, lores_w, lores_h, err)) {
         return (1);
     }
     renderer_set_colors(

@@ -132,10 +132,12 @@ setup_specific_rom_type(uint64_t quirks, char const **err)
             emu_state.max_fb = EMU_SUPER_CHIP8_FRAMEBUFFER_SIZE;
             emu_nb_inst = EMU_SUPER_CHIP8_NB_INST;
             emu_parse_fcts = g_superchip8_parse_fcts;
+            g_superchip8_parse_fcts[EMU_SUPERCHIP8_DRAW_INST] =
+              (IS_EMU_QUIRK_DRAW_WRAP(quirks)) ? superchip8_is_draw_wrap
+                                               : superchip8_is_draw;
             g_superchip8_parse_fcts[EMU_SUPERCHIP8_JP_VO_ADDR] =
               (IS_EMU_QUIRK_BXNN_INST(quirks)) ? chip8_is_jp_v0_addr_quirk
                                                : chip8_is_jp_v0_addr;
-            // TODO : add draw inst
             return (0);
         case EMU_RT_CHIP_8_COSMAC_VIP:
             emu_state.max_addr = EMU_CHIP8_COSMAC_MAX_PROG_RAM_ADDR;
@@ -191,6 +193,8 @@ emu_load_rom(char const *rom_path,
     memcpy(emu_state.ram + sizeof(emu_chip_8_fonts),
            emu_super_chip_8_fonts,
            sizeof(emu_super_chip_8_fonts));
+    emu_state.current_mode_w = EMU_CHIP8_W;
+    emu_state.current_mode_h = EMU_CHIP8_H;
     if (fread(
           emu_state.ram + EMU_CHIP8_RAM_ENTRY_POINT, 1, rom_size, rom_file) !=
         (size_t)rom_size) {
@@ -213,7 +217,23 @@ emu_load_rom(char const *rom_path,
 }
 
 int
-emu_get_framebuffer_size(int32_t *w, int32_t *h)
+emu_get_low_res_size(int32_t *w, int32_t *h)
+{
+    if (emu_rom_type == EMU_RT_CHIP_8_MODERN ||
+        emu_rom_type == EMU_RT_CHIP_8_COSMAC_VIP ||
+        emu_rom_type == EMU_RT_SUPER_CHIP_8) {
+        *w = EMU_CHIP8_W;
+        *h = EMU_CHIP8_H;
+    } else {
+        *w = 0;
+        *h = 0;
+        return (1);
+    }
+    return (0);
+}
+
+int
+emu_get_high_res_size(int32_t *w, int32_t *h)
 {
     if (emu_rom_type == EMU_RT_CHIP_8_MODERN ||
         emu_rom_type == EMU_RT_CHIP_8_COSMAC_VIP) {
@@ -227,6 +247,16 @@ emu_get_framebuffer_size(int32_t *w, int32_t *h)
         *h = 0;
         return (1);
     }
+    return (0);
+}
+
+int
+emu_get_current_resolution_mode(int32_t *mode)
+{
+    if (!mode) {
+        return (1);
+    }
+    *mode = emu_state.res_mode;
     return (0);
 }
 

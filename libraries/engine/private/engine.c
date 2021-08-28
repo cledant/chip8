@@ -112,7 +112,12 @@ engine_loop()
             (is_sound_active && !IS_ENGINE_OPTION_MUTE_SOUND(eg_options))
               ? audio_play_buzzer()
               : audio_stop_buzzer();
-            renderer_draw(emu_fb, is_sound_active);
+            int32_t mode;
+            if (emu_get_current_resolution_mode(&mode)) {
+                printf("[FATAL] Failed to get resolution mode\n");
+                return (1);
+            }
+            renderer_draw(emu_fb, is_sound_active, mode);
             eg_should_draw = 0;
         }
     }

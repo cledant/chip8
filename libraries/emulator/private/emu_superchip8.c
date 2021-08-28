@@ -175,13 +175,18 @@ superchip8_is_ld_read_rpl(emu_inst_t inst)
 int
 superchip8_exec_scd(emu_inst_t inst, void *state, char const **err)
 {
-    // TODO
     /*
      * Opcode 00CN
      */
     (void)inst;
-    (void)state;
     (void)err;
+
+    emu_state_t *es = state;
+    memmove(&es->framebuffer[((inst.n4 * EMU_SUPER_CHIP_8_W) / 8)],
+            &es->framebuffer[0],
+            EMU_SUPER_CHIP8_FRAMEBUFFER_SIZE -
+              ((inst.n4 * EMU_SUPER_CHIP_8_W) / 8));
+    memset(&es->framebuffer[0], 0, ((inst.n4 * EMU_SUPER_CHIP_8_W) / 8));
     return (0);
 }
 
@@ -263,7 +268,9 @@ superchip8_exec_low(emu_inst_t inst, void *state, char const **err)
     (void)err;
 
     emu_state_t *es = state;
-    es->high_res_mode = 0;
+    es->res_mode = EMU_RS_CHIP8;
+    es->current_mode_h = EMU_CHIP8_H;
+    es->current_mode_w = EMU_CHIP8_W;
     memset(es->framebuffer, 0, EMU_FRAMEBUFFER_MAX_SIZE);
     return (0);
 }
@@ -278,7 +285,9 @@ superchip8_exec_high(emu_inst_t inst, void *state, char const **err)
     (void)err;
 
     emu_state_t *es = state;
-    es->high_res_mode = 1;
+    es->res_mode = EMU_RS_SUPERCHIP8;
+    es->current_mode_h = EMU_SUPER_CHIP_8_H;
+    es->current_mode_w = EMU_SUPER_CHIP_8_W;
     memset(es->framebuffer, 0, EMU_FRAMEBUFFER_MAX_SIZE);
     return (0);
 }
@@ -318,8 +327,8 @@ superchip8_exec_draw_extended(emu_inst_t inst, void *state, char const **err)
      * Opcode DXY0
      */
     (void)inst;
-    (void)state;
     (void)err;
+    (void)state;
     return (0);
 }
 
@@ -338,8 +347,16 @@ superchip8_exec_draw(emu_inst_t inst, void *state, char const **err)
     rs->general_registers[0xF] = 0;
     for (uint8_t i = 0; i < size_to_copy; ++i) {
         for (uint8_t j = 0; j < 8; ++j) {
-            uint32_t write_pos_w = ((pos_w + j) % EMU_SUPER_CHIP_8_W);
-            uint32_t write_pos_h = ((pos_h + i) % EMU_SUPER_CHIP_8_H);
+            if (((((pos_w + j) / es->current_mode_w) !=
+                  ((pos_w / es->current_mode_w))) ||
+                 (((pos_h + i) / es->current_mode_h) !=
+                  ((pos_h / es->current_mode_h))))) {
+                continue;
+            }
+            uint32_t write_pos_w =
+              ((pos_w + j) % EMU_SUPER_CHIP_8_W) % es->current_mode_w;
+            uint32_t write_pos_h =
+              ((pos_h + i) % EMU_SUPER_CHIP_8_H) % es->current_mode_h;
 
             uint32_t fb_bit_pos =
               (write_pos_w + EMU_SUPER_CHIP_8_W * write_pos_h) / 8;

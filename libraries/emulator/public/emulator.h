@@ -36,7 +36,9 @@ int emu_load_rom(char const *rom_path,
                  uint64_t quirks,
                  uint64_t options,
                  char const **err);
-int emu_get_framebuffer_size(int32_t *w, int32_t *h);
+int emu_get_low_res_size(int32_t *w, int32_t *h);
+int emu_get_high_res_size(int32_t *w, int32_t *h);
+int emu_get_current_resolution_mode(int32_t *mode);
 int emu_press_key(int32_t key_value);
 int emu_release_key(int32_t key_value);
 void emu_decrement_timers();

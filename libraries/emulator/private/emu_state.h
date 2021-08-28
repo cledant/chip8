@@ -27,6 +27,16 @@
 #define EMU_SUPER_CHIP_8_FONT_HEIGHT 10
 
 /*
+ * Enum
+ */
+typedef enum e_emu_res_modes
+{
+    EMU_RS_CHIP8 = 0,
+    EMU_RS_SUPERCHIP8,
+    EMU_RS_NB,
+} emu_res_mode_t;
+
+/*
  * Structs
  */
 typedef struct s_emu_registers_state
@@ -45,12 +55,14 @@ typedef struct s_emu_state
 {
     uint32_t max_addr;
     uint32_t max_fb;
+    int32_t res_mode;
+    int32_t current_mode_w;
+    int32_t current_mode_h;
     emu_registers_state_t registers;
     int32_t keys_state[EMU_NB_KEYS];
     uint8_t framebuffer[EMU_FRAMEBUFFER_MAX_SIZE];
     uint8_t ram[EMU_RAM_SIZE];
     uint8_t skip_fetch;
-    uint8_t high_res_mode;
     uint8_t should_exit;
 } emu_state_t;
 

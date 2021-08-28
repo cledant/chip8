@@ -13,8 +13,9 @@ typedef struct s_renderer
     SDL_Renderer *renderer;
     SDL_Texture *tex;
     SDL_Rect tex_pos;
-    int32_t fb_w;
-    int32_t fb_h;
+    int32_t hires_w;
+    int32_t hires_h;
+    SDL_Rect lores;
 } renderer_t;
 
 typedef enum e_color_type
@@ -49,7 +50,7 @@ copy_emulator_fb(void const *one_bit_depth_fb)
 
     uint8_t mask = 0;
     int32_t j = 0;
-    int32_t total_size = rdr_env.fb_h * rdr_env.fb_w;
+    int32_t total_size = rdr_env.hires_h * rdr_env.hires_w;
     for (int32_t i = 0; i < total_size; ++i) {
         int32_t bit_value = ((1 << mask) & emu_buff[j]) >> mask;
         tex_buff[i] = rdr_emu_colors_rgb[bit_value];
@@ -133,21 +134,29 @@ renderer_destroy_window()
 }
 
 int
-renderer_create_framebuffer(int32_t fb_w, int32_t fb_h, char const **err)
+renderer_create_framebuffer(int32_t hires_w,
+                            int32_t hires_h,
+                            int32_t lores_w,
+                            int32_t lores_h,
+                            char const **err)
 {
     rdr_env.tex = SDL_CreateTexture(rdr_env.renderer,
                                     SDL_PIXELFORMAT_ARGB8888,
                                     SDL_TEXTUREACCESS_STREAMING,
-                                    fb_w,
-                                    fb_h);
+                                    hires_w,
+                                    hires_h);
     if (!rdr_env.tex) {
         if (err) {
             *err = "Failed to create renderer texture";
         }
         return (1);
     }
-    rdr_env.fb_w = fb_w;
-    rdr_env.fb_h = fb_h;
+    rdr_env.hires_w = hires_w;
+    rdr_env.hires_h = hires_h;
+    rdr_env.lores.w = lores_w;
+    rdr_env.lores.h = lores_h;
+    rdr_env.lores.x = 0;
+    rdr_env.lores.y = 0;
     return (0);
 }
 
@@ -164,7 +173,7 @@ renderer_set_colors(uint32_t background,
 }
 
 int
-renderer_draw(void const *one_bit_depth_fb, int is_sound_active)
+renderer_draw(void const *one_bit_depth_fb, int is_sound_active, int res_mode)
 {
     uint32_t win_background_color;
     if (!is_sound_active) {
@@ -181,7 +190,13 @@ renderer_draw(void const *one_bit_depth_fb, int is_sound_active)
                            0);
     SDL_RenderClear(rdr_env.renderer);
     copy_emulator_fb(one_bit_depth_fb);
-    SDL_RenderCopy(rdr_env.renderer, rdr_env.tex, NULL, &rdr_env.tex_pos);
+    (void)res_mode;
+    if (res_mode) {
+        SDL_RenderCopy(rdr_env.renderer, rdr_env.tex, NULL, &rdr_env.tex_pos);
+    } else {
+        SDL_RenderCopy(
+          rdr_env.renderer, rdr_env.tex, &rdr_env.lores, &rdr_env.tex_pos);
+    }
     SDL_RenderPresent(rdr_env.renderer);
     return (0);
 }
