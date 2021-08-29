@@ -135,6 +135,10 @@ setup_specific_rom_type(uint64_t quirks, char const **err)
             g_superchip8_parse_fcts[EMU_SUPERCHIP8_DRAW_INST] =
               (IS_EMU_QUIRK_DRAW_WRAP(quirks)) ? superchip8_is_draw_wrap
                                                : superchip8_is_draw;
+            g_superchip8_parse_fcts[EMU_SUPERCHIP8_DRAW_EXTENDED_INST] =
+              (IS_EMU_QUIRK_DRAW_WRAP(quirks))
+                ? superchip8_is_draw_extended_wrap
+                : superchip8_is_draw_extended;
             g_superchip8_parse_fcts[EMU_SUPERCHIP8_JP_VO_ADDR] =
               (IS_EMU_QUIRK_BXNN_INST(quirks)) ? chip8_is_jp_v0_addr_quirk
                                                : chip8_is_jp_v0_addr;
