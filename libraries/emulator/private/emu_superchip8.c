@@ -482,7 +482,9 @@ superchip8_exec_ld_store_rpl(emu_inst_t inst, void *state, char const **err)
     emu_state_t *es = state;
     emu_registers_state_t *rs = &es->registers;
 
-    rs->flag_registers[inst.n2] = rs->general_registers[inst.n2];
+    for (uint8_t i = 0; i <= inst.n2; ++i) {
+        rs->flag_registers[i] = rs->general_registers[i];
+    }
     return (0);
 }
 
@@ -507,6 +509,8 @@ superchip8_exec_ld_read_rpl(emu_inst_t inst, void *state, char const **err)
     emu_state_t *es = state;
     emu_registers_state_t *rs = &es->registers;
 
-    rs->general_registers[inst.n2] = rs->flag_registers[inst.n2];
+    for (uint8_t i = 0; i <= inst.n2; ++i) {
+        rs->general_registers[i] = rs->flag_registers[i];
+    }
     return (0);
 }
