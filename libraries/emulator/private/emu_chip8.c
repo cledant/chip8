@@ -646,7 +646,7 @@ chip8_exec_sub(emu_inst_t inst, void *state, char const **err)
     emu_registers_state_t *rs = &es->registers;
 
     uint8_t flag =
-      (rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_x] >
+      (rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_x] >=
        rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_y])
         ? 1
         : 0;
@@ -687,7 +687,7 @@ chip8_exec_subn(emu_inst_t inst, void *state, char const **err)
     emu_registers_state_t *rs = &es->registers;
 
     uint8_t flag =
-      (rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_y] >
+      (rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_y] >=
        rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_x])
         ? 1
         : 0;
