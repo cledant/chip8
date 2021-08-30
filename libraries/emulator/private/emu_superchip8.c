@@ -205,6 +205,9 @@ superchip8_exec_scr(emu_inst_t inst, void *state, char const **err)
         uint64_t *ptr_left = (uint64_t *)&es->framebuffer[i];
         uint64_t shifted_left_part = *ptr_left
                                      << EMU_SUPER_CHIP_8_RIGHT_SCROLL_PX;
+        uint64_t leftover_left =
+          *ptr_left & (EMU_SUPER_CHIP_8_LATERAL_SCROLL_MASK
+                       << (64 - EMU_SUPER_CHIP_8_RIGHT_SCROLL_PX));
 
         uint64_t *ptr_right =
           (uint64_t *)&es->framebuffer[i + (EMU_SUPER_CHIP_8_W / 16)];
@@ -213,6 +216,8 @@ superchip8_exec_scr(emu_inst_t inst, void *state, char const **err)
 
         *ptr_left = shifted_left_part;
         *ptr_right = shifted_right_part;
+        *ptr_right |=
+          (leftover_left >> (64 - EMU_SUPER_CHIP_8_RIGHT_SCROLL_PX));
     }
     return (0);
 }
@@ -237,8 +242,11 @@ superchip8_exec_scl(emu_inst_t inst, void *state, char const **err)
           (uint64_t *)&es->framebuffer[i + (EMU_SUPER_CHIP_8_W / 16)];
         uint64_t shifted_right_part =
           *ptr_right >> EMU_SUPER_CHIP_8_LEFT_SCROLL_PX;
+        uint64_t leftover_right =
+          *ptr_right & EMU_SUPER_CHIP_8_LATERAL_SCROLL_MASK;
 
         *ptr_left = shifted_left_part;
+        *ptr_left |= (leftover_right << (64 - EMU_SUPER_CHIP_8_LEFT_SCROLL_PX));
         *ptr_right = shifted_right_part;
     }
     return (0);
