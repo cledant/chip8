@@ -232,7 +232,10 @@ superchip8_exec_draw_extended_wrap(emu_inst_t inst,
             }
             uint16_t *sprite_data =
               (uint16_t *)&es->ram[rs->address_register + (i * 2)];
-            uint16_t sprite_bit = (*sprite_data & (1 << j)) >> j;
+            uint16_t endian_sprite_data =
+              (*sprite_data >> 8) | (*sprite_data << 8);
+            uint16_t sprite_bit =
+              (endian_sprite_data & (1 << (15 - j))) >> (15 - j);
             uint16_t fb_bit =
               (es->framebuffer[fb_bit_pos] & (1 << fb_bit_offset)) >>
               fb_bit_offset;
