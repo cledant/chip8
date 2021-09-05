@@ -924,15 +924,22 @@ chip8_exec_ld_register_key(emu_inst_t inst, void *state, char const **err)
     (void)err;
     emu_state_t *es = state;
     emu_registers_state_t *rs = &es->registers;
+    static uint8_t key_pressed[EMU_NB_KEYS];
+    uint8_t was_key_release = 0;
 
-    for (uint8_t i = 0; i < EMU_NB_KEYS; ++i) {
-        if (es->keys_state[i]) {
+    for (int8_t i = 0; i < EMU_NB_KEYS; ++i) {
+        if (!es->keys_state[i] && key_pressed[i]) {
+            was_key_release = 1;
+            key_pressed[i] = 0;
             es->skip_fetch = 0;
             rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_x] = i;
-            return (0);
+        } else if (es->keys_state[i] && !key_pressed[i]) {
+            key_pressed[i] = 1;
         }
     }
-    es->skip_fetch = 1;
+    if (!was_key_release) {
+        es->skip_fetch = 1;
+    }
     return (0);
 }
 
