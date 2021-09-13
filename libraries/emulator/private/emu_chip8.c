@@ -871,7 +871,7 @@ chip8_exec_skp(emu_inst_t inst, void *state, char const **err)
 
     uint8_t key_val =
       rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_x];
-    if (key_val > EMU_NB_KEYS) {
+    if (key_val >= EMU_NB_KEYS) {
         return (0);
     }
     if (es->keys_state[key_val]) {
@@ -891,7 +891,7 @@ chip8_exec_sknp(emu_inst_t inst, void *state, char const **err)
     emu_registers_state_t *rs = &es->registers;
 
     uint8_t key_val = rs->general_registers[inst.n2];
-    if (key_val > EMU_NB_KEYS) {
+    if (key_val >= EMU_NB_KEYS) {
         return (0);
     }
     if (!es->keys_state[key_val]) {

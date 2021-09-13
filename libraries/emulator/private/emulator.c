@@ -402,6 +402,7 @@ emu_open_flag_registers_file(char const *filepath, char const **err)
         return (1);
     }
     if (fseek(file, 0, SEEK_END)) {
+        fclose(file);
         if (err) {
             *err = "Fseek failed";
         }
@@ -432,6 +433,7 @@ emu_open_flag_registers_file(char const *filepath, char const **err)
         }
         return (1);
     }
+    fclose(file);
     return (0);
 }
 
