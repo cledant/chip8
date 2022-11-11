@@ -11,7 +11,7 @@ target_include_directories(engine
 set_target_properties(engine PROPERTIES
         C_STANDARD 11
         C_STANDARD_REQUIRED YES
-        C_EXTENSIONS NO)
+        C_EXTENSIONS YES)
 target_link_libraries(engine input event_buffer emulator renderer tools audio)
 add_dependencies(engine input event_buffer emulator renderer tools audio)
 target_compile_options(engine PRIVATE -Wall -Wextra -Werror)

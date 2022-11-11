@@ -11,5 +11,5 @@ target_include_directories(event_buffer
 set_target_properties(event_buffer PROPERTIES
         C_STANDARD 11
         C_STANDARD_REQUIRED YES
-        C_EXTENSIONS NO)
+        C_EXTENSIONS YES)
 target_compile_options(event_buffer PRIVATE -Wall -Wextra -Werror)

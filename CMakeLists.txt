@@ -69,5 +69,5 @@ add_dependencies(chip8_emu emulator renderer engine input audio)
 set_target_properties(chip8_emu PROPERTIES
         C_STANDARD 11
         C_STANDARD_REQUIRED YES
-        C_EXTENSIONS NO)
+        C_EXTENSIONS YES)
 target_compile_options(chip8_emu PRIVATE -Wall -Wextra -Werror)
