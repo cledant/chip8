@@ -363,7 +363,8 @@ parse_args(t_env *env, int argc, char const **argv)
                                        0,
                                        0 };
 
-    if (argc == 1) {
+    if (argc == 1 || (argc == 2 && (!strcmp(options[0], argv[1]) ||
+                                    !strcmp(options[1], argv[1])))) {
         show_help();
         return (1);
     }
