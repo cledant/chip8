@@ -140,8 +140,8 @@ setup_specific_rom_type(uint64_t quirks, char const **err)
                 ? superchip8_is_draw_extended_wrap
                 : superchip8_is_draw_extended;
             g_superchip8_parse_fcts[EMU_SUPERCHIP8_JP_VO_ADDR] =
-              (IS_EMU_QUIRK_BXNN_INST(quirks)) ? chip8_is_jp_v0_addr_quirk
-                                               : chip8_is_jp_v0_addr;
+              (!IS_EMU_QUIRK_BXNN_INST(quirks)) ? chip8_is_jp_v0_addr_quirk
+                                                : chip8_is_jp_v0_addr;
             return (0);
         case EMU_RT_CHIP_8_COSMAC_VIP:
             emu_state.max_addr = EMU_CHIP8_COSMAC_MAX_PROG_RAM_ADDR;
