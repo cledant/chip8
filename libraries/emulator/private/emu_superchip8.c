@@ -10,6 +10,7 @@
 
 #include "emu_inst.h"
 #include "emu_state.h"
+#include "emu_quirks.h"
 
 /*
  * emu_superchip8 variables
@@ -42,7 +43,7 @@ emu_parse_fct_t g_superchip8_parse_fcts[EMU_SUPER_CHIP8_NB_INST] = {
     chip8_is_shl,
     chip8_is_sne_register_register,
     chip8_is_ld_addr_register_addr,
-    chip8_is_jp_v0_addr,
+    chip8_is_jp_v0_addr_quirk,
     chip8_is_rnd,
     superchip8_is_draw_extended,
     superchip8_is_draw,

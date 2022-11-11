@@ -2,8 +2,8 @@
 #define CHIP8_EMU_EMU_SUPERCHIP8_H
 
 /*
- * This implementation will follow SUPERCHIP8 1.1 technical reference from
- * http://devernay.free.fr/hacks/chip8/schip.txt
+ * This implementation will mostly follow SUPERCHIP8 1.1 technical reference
+ * from http://devernay.free.fr/hacks/chip8/schip.txt
  */
 #include "emu_chip8.h"
 

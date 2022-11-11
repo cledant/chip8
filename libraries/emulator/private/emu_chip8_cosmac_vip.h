@@ -16,6 +16,9 @@ emu_exec_fct_t chip8_cosmac_vip_is_shr(emu_inst_t inst);
 emu_exec_fct_t chip8_cosmac_vip_is_shl(emu_inst_t inst);
 emu_exec_fct_t chip8_cosmac_vip_is_ld_store_register(emu_inst_t inst);
 emu_exec_fct_t chip8_cosmac_vip_is_ld_read_register(emu_inst_t inst);
+emu_exec_fct_t chip8_cosmac_vip_is_or(emu_inst_t inst);
+emu_exec_fct_t chip8_cosmac_vip_is_and(emu_inst_t inst);
+emu_exec_fct_t chip8_cosmac_vip_is_xor(emu_inst_t inst);
 
 /*
  * Chip8 Cosmac Inst Exec fct
@@ -28,5 +31,8 @@ int chip8_cosmac_vip_exec_ld_store_register(emu_inst_t inst,
 int chip8_cosmac_vip_exec_ld_read_register(emu_inst_t inst,
                                            void *state,
                                            char const **err);
+int chip8_cosmac_vip_exec_or(emu_inst_t inst, void *state, char const **err);
+int chip8_cosmac_vip_exec_and(emu_inst_t inst, void *state, char const **err);
+int chip8_cosmac_vip_exec_xor(emu_inst_t inst, void *state, char const **err);
 
 #endif // CHIP8_EMU_EMU_CHIP8_COSMAC_VIP_H

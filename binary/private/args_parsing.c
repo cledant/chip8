@@ -51,7 +51,10 @@ show_help()
     printf("\t-z: Buzzer RGB color in hex format. Default is 0x%6x\n",
            ARGS_DEFAULT_BUZZER_COLOR);
     puts("\t-A: Warn when instruction are not even aligned.");
-    puts("\t-B: Activate SUPERCHIP8 quirk on BNNN instrution.");
+    puts("\t-B: Activate SUPERCHIP8 quirk on BNNN instruction for CHIP8 and "
+         "CHIP8_COSMAC_VIP modes");
+    puts("\t    Deactivate SUPERCHIP8 quirk on BNNN instruction for "
+         "SUPERCHIP8 mode");
     puts("\t-W: Change sprite drawing behaviour from clipping to wrapping.");
 }
 

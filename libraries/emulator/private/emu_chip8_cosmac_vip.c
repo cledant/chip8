@@ -26,9 +26,9 @@ emu_parse_fct_t g_chip8_cosmac_vip_parse_fcts[EMU_CHIP8_NB_INST] = {
     chip8_is_ld_register_byte,
     chip8_is_add_register_byte,
     chip8_is_ld_register_register,
-    chip8_is_or,
-    chip8_is_and,
-    chip8_is_xor,
+    chip8_cosmac_vip_is_or,
+    chip8_cosmac_vip_is_and,
+    chip8_cosmac_vip_is_xor,
     chip8_is_add_register_register,
     chip8_is_sub,
     chip8_cosmac_vip_is_shr,
@@ -93,6 +93,33 @@ chip8_cosmac_vip_is_ld_read_register(emu_inst_t inst)
 {
     if (inst.n1 == 0xF && inst.n3 == 0x6 && inst.n4 == 0x5) {
         return (chip8_cosmac_vip_exec_ld_read_register);
+    }
+    return (NULL);
+}
+
+emu_exec_fct_t
+chip8_cosmac_vip_is_or(emu_inst_t inst)
+{
+    if (inst.n1 == 0x8 && inst.n4 == 0x1) {
+        return (chip8_cosmac_vip_exec_or);
+    }
+    return (NULL);
+}
+
+emu_exec_fct_t
+chip8_cosmac_vip_is_and(emu_inst_t inst)
+{
+    if (inst.n1 == 0x8 && inst.n4 == 0x2) {
+        return (chip8_cosmac_vip_exec_and);
+    }
+    return (NULL);
+}
+
+emu_exec_fct_t
+chip8_cosmac_vip_is_xor(emu_inst_t inst)
+{
+    if (inst.n1 == 0x8 && inst.n4 == 0x3) {
+        return (chip8_cosmac_vip_exec_xor);
     }
     return (NULL);
 }
@@ -199,5 +226,53 @@ chip8_cosmac_vip_exec_ld_read_register(emu_inst_t inst,
         rs->general_registers[i] = es->ram[rs->address_register + i];
     }
     rs->address_register += (inst.n2 + 1);
+    return (0);
+}
+
+int
+chip8_cosmac_vip_exec_or(emu_inst_t inst, void *state, char const **err)
+{
+    /*
+     * Opcode 8XY1
+     */
+    (void)err;
+    emu_state_t *es = state;
+    emu_registers_state_t *rs = &es->registers;
+
+    rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_x] |=
+      rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_y];
+    rs->general_registers[0xF] = 0;
+    return (0);
+}
+
+int
+chip8_cosmac_vip_exec_and(emu_inst_t inst, void *state, char const **err)
+{
+    /*
+     * Opcode 8XY2
+     */
+    (void)err;
+    emu_state_t *es = state;
+    emu_registers_state_t *rs = &es->registers;
+
+    rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_x] &=
+      rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_y];
+    rs->general_registers[0xF] = 0;
+    return (0);
+}
+
+int
+chip8_cosmac_vip_exec_xor(emu_inst_t inst, void *state, char const **err)
+{
+    /*
+     * Opcode 8XY3
+     */
+    (void)err;
+    emu_state_t *es = state;
+    emu_registers_state_t *rs = &es->registers;
+
+    rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_x] ^=
+      rs->general_registers[((emu_inst_reg_reg_t *)&inst)->gen_reg_y];
+    rs->general_registers[0xF] = 0;
     return (0);
 }
