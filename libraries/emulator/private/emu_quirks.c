@@ -64,10 +64,11 @@ chip8_exec_jp_v0_addr_quirk(emu_inst_t inst, void *state, char const **err)
     (void)err;
     emu_state_t *es = state;
     emu_registers_state_t *rs = &es->registers;
-    emu_inst_reg_uint8_t inst_addr = emu_inst_to_emu_inst_reg_uint8(inst);
+    emu_inst_reg_uint8_t inst_reg = emu_inst_to_emu_inst_reg_uint8(inst);
+    emu_inst_addr_t inst_addr = emu_inst_to_emu_inst_addr(inst);
 
     rs->program_counter =
-      rs->general_registers[inst_addr.gen_reg] + inst_addr.value;
+      rs->general_registers[inst_reg.gen_reg] + inst_addr.addr;
     return (0);
 }
 
